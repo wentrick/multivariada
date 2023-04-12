@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse,ggExtra,ggpubr)
+pacman::p_load(tidyverse,ggExtra,ggpubr,vroom,readxl)
 # exercícios do capítulo 1 de Johnson e Wichern
 
 # 1.2 ----
@@ -41,8 +41,25 @@ dados_long = as.data.frame(dados) %>%
 xplot <- ggdensity(dados2, "values", fill = "var",
                    palette = "jco")
 
-dados_resumo = as.data.frame(dados2) %>%
+dados_resumo = as.data.frame(dados_long) %>%
   group_by(var) %>%
   summarise(mean=mean(values), sd=sd(values))
 # 1.14 ----
+data_1_14 = read_excel("data/data_1.14.xlsx", 
+              col_types = c("numeric", "numeric", "numeric", 
+                            "numeric", "numeric", "numeric"))
+
+scatter_data = data_1_14 %>%
+  filter(group == 1) %>%
+  select(total_response_s1,total_response_s2)
+  
+ggplot(scatter_data,aes(x = total_response_s1,y = total_response_s2))+
+  geom_point()
+
+dados_resumo = data_1_14 %>%
+  pivot_longer(cols = c(1,2,3,4,5), names_to = "var", values_to = "value") %>%
+  group_by(group,var) %>%
+  summarise(mean=round(mean(value),2), sd=round(sd(value),2))
+
+
 # 1.22 ----
