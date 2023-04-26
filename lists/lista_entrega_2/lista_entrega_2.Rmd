@@ -1,0 +1,95 @@
+---
+title: "Lista Entrega 2"
+author: "Davi Wentrick Feijó"
+date: "2023-04-25"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,psych,knitr)
+set.seed(12)
+```
+
+### 4) Exercício 30 da Lista 3  
+
+Utilize a decomposição espectral $\Sigma = UDV^T$ para mostrar que $\sum_{i=1}^{n}Var(x_i)$ = $\sum_{i=1}^{n}\lambda_i$ , em que $\lambda_i$ são os elementos da matriz diagonal D.
+
+
+```{r include=FALSE}
+dados <- matrix(round(runif(16,min = 50,max = 100), 0),nrow = 4)
+
+```
+
+```{r}
+kable(dados)
+```
+
+Vamos calcular a matriz de covariancias!
+
+```{r include=FALSE}
+cov <- cov(dados)
+```
+
+```{r}
+kable(cov)
+```
+
+Vamos obter os autovetores e autovalores
+
+```{r include=FALSE}
+# Obtendo autovalores e autovetores
+auto <- eigen(cov)
+autovalores <- auto$values
+autovetores <- auto$vectors
+```
+
+
+```{r echo=FALSE}
+auto
+```
+
+Obtendo a matriz diagonal dos autovalores 
+
+```{r include=FALSE}
+# Obtendo a matriz diagonal de autovalores
+D <- diag(autovalores)
+```
+
+```{r echo=FALSE}
+kable(D)
+```
+
+Matriz do autovetores
+
+```{r}
+# Obtendo a matriz de autovetores
+P <- autovetores
+```
+
+
+
+Obtendo a matriz inversa dos autovetores
+
+```{r include=FALSE}
+# Obtendo a matriz de autovetores inversa
+pinv_P <- solve(autovetores)
+```
+
+```{r echo=FALSE}
+kable(pinv_P)
+```
+
+
+
+
+
+
+
+
+
+
+
