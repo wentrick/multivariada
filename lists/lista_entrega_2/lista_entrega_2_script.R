@@ -32,7 +32,7 @@ decomp_espectral
 # Calculando a variância total
 var_total <- sum(diag(cov))
 
-# Calculando a variância explicada por cada componente principal
+# Calculando a variância explicada por cada dimensao
 var_explicada <- autovalores / var_total
 
 # Visualizando a variância explicada
