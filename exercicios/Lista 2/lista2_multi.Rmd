@@ -1,0 +1,88 @@
+---
+title: "Lista 2 Multivariada"
+author: "Davi Wentrick Feijó"
+date: "2023-05-02"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Provar o seguinte teorema: Sejam $A$ e $B$ matrizes idempotentes. Então,
+(a) $A + B$ é idempotente somente quando $AB = BA = 0$.
+
+$$
+(A + B)^2 = A + B
+$$
+$$
+A^2 + AB + BA + B^2 = A + B
+$$
+Como $A$ e $B$ são idempotentes, temos $A^2 = A$ e $B^2 = B$. 
+
+$$
+A + AB + BA + B = A + B
+$$
+$$
+AB + BA  = A + B - B - A 
+$$
+$$
+AB + BA  = 0
+$$
+
+(b) $C = AB$ é idempotente somente quando $AB = BA$.
+
+$$
+C^2 = ABAB = AB
+$$
+Agora, queremos manipular essa equação para obter AB = BA. Para isso, podemos reescrever ABAB da seguinte forma
+$$
+ABAB = AB
+$$
+
+
+$$
+ABAB - AB = 0
+$$
+$$
+AB(AB - I) = 0
+$$
+
+Para essa equacao ser igual a zero temos duas opceos:
+$$
+AB = 0 \ \ \ \ \ \ AB - I = 0 \Rightarrow AB = I
+$$
+
+
+
+(c) $I - A$ é idempotente.
+
+Temos que mostrar que:
+$$
+(I - A)^2 = I - A
+$$
+Vamos abrir o quadrado
+$$
+ I^2 - IA - AI + A^2 = I - A
+$$
+$$
+ I - 2A + A^2 = I - A
+$$
+Como A é idempotente entao $A^2 = A$
+
+$$
+ I - 2A + A = I - A
+$$
+$$
+ I - A = I - A
+$$
+Acabmos de mostrar que 
+
+$$
+(I - A)^2 = (I - A)
+$$
+
+
+
+
+
