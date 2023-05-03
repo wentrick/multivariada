@@ -1,73 +1,99 @@
-# crie uma matriz de dados para o exemplo
-dados <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9), ncol = 3)
+pacman::p_load(Matrix,expm,tidyverse)
 
-# centralize os dados
-dados_centralizados <- scale(dados, center = TRUE, scale = FALSE)
+##### Questao 1 ----
 
-# calcule a matriz de covariância dos dados
-matriz_covariancia <- cov(dados_centralizados)
+S <- matrix(c(4, -2, 2, -2, 
+              -2, 5, 1, 2, 
+              2, 1, 3, 0, 
+              -2, 2, 0, 6), nrow = 4, ncol = 4)
 
-# execute a decomposição SVD da matriz de covariância
-svd_resultados <- svd(matriz_covariancia)
+# Calcular a matriz inversa da raiz quadrada de S
+S_inv_sqrt <- solve(sqrtm(cov(S)))
 
-# obtenha os componentes principais
-componentes_principais <- svd_resultados$v
+# Imprimir a matriz S_inv_sqrt
+z = S * S_inv_sqrt 
 
-# obtenha os scores dos componentes principais
-scores <- dados_centralizados %*% componentes_principais
+cov_teste = cov(z)
 
-# visualize os resultados do PCA
-print(componentes_principais)
-print(scores)
+prcomp(z)
 
-##################################
+round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),2)
 
-# crie uma matriz de dados para o exemplo
-dados <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9), ncol = 3)
+##### Questao 2 ----
+#dados
+dt = c(8,98,7,2,12,8,2,7,107,4,3,9,5,3,7,103,4,3,5,6,3,10,88,5,2,8,15,4,
+       6,91,4,2,8,10,3, 8,90,5,2,12,12,4,9,84,7,4,12,15,5,5,72,6,4,21,14,4,
+       7,82,5,1,11,11,3,8,64,5,2,13,9,4,6,71,5,4,10,3,3,6,91,4,2,12,7,3,
+       7,72,7,4,18,10,3,10,70,4,2,11,7,3,10,72,4,1,8,10,3,9,77,4,1,9,10,3,
+       8,76,4,1,7,7,3,8,71,5,3,16,4,4,9,67,4,2,13,2,3,9,69,3,3,9,5,3,
+       10,62,5,3,14,4,4,9,88,4,2,7,6,3,8,80,4,2,13,11,4,5,30,3,3,5,2,3,
+       6,83,5,1,10,23,4,8,84,3,2,7,6,3,6,78,4,2,11,11,3,8,79,2,1,7,10,3,
+       6,62,4,3,9,8,3,10,37,3,1,7,2,3,8,71,4,1,10,7,3,7,52,4,1,12,8,4,
+       5,48,6,5,8,4,3,6,75,4,1,10,24,3,10,35,4,1,6,9,2,8,85,4,1,9,10,2,
+       5,86,3,1,6,12,2,5,86,7,2,13,18,2,7,79,7,4,9,25,3,7,79,5,2,8,6,2,
+       6,68,6,2,11,14,3,8,40,4,3,6,5,2)
 
-# execute o PCA nos dados
-pca_resultados <- prcomp(dados, center = TRUE, scale. = TRUE)
+dados = matrix(dt,ncol = 7, byrow = TRUE)
+colnames(dados) = c("wind","solar_radiation","CO","NO","NO2","O3","HC")
 
-# obtenha os scores dos componentes principais
-scores <- pca_resultados$x
+S_cov = cov(dados)
+S_cor = cor(dados)
 
-# calcule a variância de cada PC
-variancia <- var(scores)
+#PCA com matriz de covariancia
 
-# calcule o desvio padrão de cada PC
-desvio_padrao <- sd(scores)
-
-# imprima os resultados
-print(variancia)
-print(desvio_padrao)
-sum(variancia)
-
-
-pca_resultados$x
-
+pca_resultados = prcomp(S_cov,center = T, scale. = T)
 
 pca_resultados$sdev
 
-dados  %*%  pca_resultados$rotation
+test = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),2)
+sum(test[1:4])
+
 pca_resultados$x
+plot(test, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+#PCA com matriz de correlação
+
+pca_resultados = prcomp(S_cor,center = T, scale. = T)
+
+pca_resultados$sdev
+
+test = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),2)
+sum(test[1:4])
+
+pca_resultados$x
+plot(test, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+###### manual ----
+#fazendo o pca manualmente por meio do svd() usando a matriz de covariancias
+cov.mat <- cov(scale(dados, center = TRUE, scale = TRUE))
+
+svd.out <- svd(cov.mat)
+
+pc <- dados %*% svd.out$v
+
+var.prop <- svd.out$d^2/ sum(svd.out$d^2)
+
+plot(var.prop, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
 
 
-################################
+round(var.prop,2)
 
-# criar um conjunto de dados com duas variáveis
-set.seed(123)
-dados <- data.frame(x = rnorm(100, mean = 10, sd = 2),
-                    y = rnorm(100, mean = 20, sd = 5),
-                    z = rnorm(100, mean = 30, sd = 10))
+#fazendo o pca manualmente por meio do svd() usando a matriz de covariancias
 
-# calcular a matriz de covariância dos dados
-cov_mat <- cov(dados)
+cov.mat <- cor(scale(dados, center = TRUE, scale = TRUE))
 
-# calcular a transformação de Mahalanobis
-mahal <- mahalanobis(dados, colMeans(dados), cov_mat)
+svd.out <- svd(cov.mat)
 
-# imprimir os resultados
-mahal
+pc <- dados %*% svd.out$v
 
-dados %*% sqrt(cov_mat)
+var.prop <- svd.out$d^2/ sum(svd.out$d^2)
+
+plot(var.prop, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+
+round(var.prop,2)
+
+
+
+
+
+
+
 
