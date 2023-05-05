@@ -1,17 +1,16 @@
 pacman::p_load(Matrix,expm,tidyverse)
 
 ##### Questao 1 ----
-
-S <- matrix(c(4, -2, 2, -2, 
+x <- matrix(c(4, -2, 2, -2, 
               -2, 5, 1, 2, 
               2, 1, 3, 0, 
               -2, 2, 0, 6), nrow = 4, ncol = 4)
 
 # Calcular a matriz inversa da raiz quadrada de S
-S_inv_sqrt <- solve(sqrtm(cov(S)))
+S_inv_sqrt <- solve(sqrtm(cov(x)))
 
 # Imprimir a matriz S_inv_sqrt
-z = S * S_inv_sqrt 
+z = x * S_inv_sqrt 
 
 cov_teste = cov(z)
 

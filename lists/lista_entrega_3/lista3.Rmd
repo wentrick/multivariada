@@ -1,0 +1,235 @@
+---
+title: "Lista 3 Entrega Multivariada"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-05-04"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(Matrix,expm,tidyverse,knitr,ape)
+
+```
+
+
+### Exercício 32 da Lista 4  
+
+Suponha que um pesquisador padronizou os dados de um estudo através da transformação de Mahalanobis $(Z = XS^{-1/2})$, em que $S$ é a matriz de variância-covariâncias amostrais. Seria razoável aplicar componentes principais nos dados transformados? Justifique sua resposta.
+
+Vamos usar a seguinte matriz como exemplo! ela vai ser nosso $X$
+```{r echo=FALSE}
+##### Questao 1 ----
+
+x <- matrix(c(4, -2, 2, -2, 
+              -2, 5, 1, 2, 
+              2, 1, 3, 0, 
+              -2, 2, 0, 6), nrow = 4, ncol = 4)
+kable(x)
+```
+
+Agora vamos calcular a inversa da matriz exemplo e depois tirar sua raiz quadrada para encontrar $S^{-1/2}$
+```{r echo=FALSE}
+# Calcular a matriz inversa da raiz quadrada de S
+s <- solve(sqrtm(cov(x)))
+kable(s)
+```
+
+Agora podemos jogar na formula para encontrar $Z$
+```{r echo=FALSE}
+# Imprimir a matriz S_inv_sqrt
+z = x * s
+kable(z)
+```
+
+Agora podemos tirar a matriz de covariancia de $Z$
+```{r echo=FALSE}
+cov_z = cov(z)
+kable(cov_z)
+```
+
+\newpage
+Em seguida podemos utilizar a matriz de covariancia de Z para fazer nosso PCA 
+```{r echo=FALSE}
+pca_resultados = prcomp(cov_z)
+names = c("PC1","PC2","PC3","PC4")
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+var_exp = setNames((var_exp),names)
+
+kable(pca_resultados$x)
+```
+
+Aqui temos a variancia explicada com cada PC
+```{r echo=FALSE}
+kable(var_exp)
+```
+
+Podemos comparar com uma PCA aplicada na matriz de covariancia de X sem passar pela transformação de Mahalanobis
+```{r echo=FALSE}
+pca_resultados = prcomp(cov(x))
+names = c("PC1","PC2","PC3","PC4")
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+var_exp = setNames((var_exp),names)
+
+kable(pca_resultados$x)
+```
+
+A variancia explicada da matriz de covariancia de X
+```{r echo=FALSE}
+kable(var_exp)
+```
+
+Podemos perceber que a transformacao concentrou quase toda informação na primeira componente .A aplicação da PCA na matriz de Mahalanobis pode ajudar a reduzir a dimensionalidade da matriz e permitir que as informações mais relevantes sejam extraídas.
+
+\newpage
+### Exercício 37 da Lista 4 - Johnson e Wichern - Exercício 8.12. 
+
+Dados no arquivo Air Pollution (T1-5.DAT). Os dados correspondem a 42 medidas de poluição do ar observadas na área de Los Angeles em um mesmo horário. $X1: Wind; X2: Solar Radiation; X3: CO; X4: NO; X5: NO2; X6: O3; X7: HC.$
+
+
+```{r echo=FALSE}
+#dados
+dt = c(8,98,7,2,12,8,2,7,107,4,3,9,5,3,7,103,4,3,5,6,3,10,88,5,2,8,15,4,
+       6,91,4,2,8,10,3, 8,90,5,2,12,12,4,9,84,7,4,12,15,5,5,72,6,4,21,14,4,
+       7,82,5,1,11,11,3,8,64,5,2,13,9,4,6,71,5,4,10,3,3,6,91,4,2,12,7,3,
+       7,72,7,4,18,10,3,10,70,4,2,11,7,3,10,72,4,1,8,10,3,9,77,4,1,9,10,3,
+       8,76,4,1,7,7,3,8,71,5,3,16,4,4,9,67,4,2,13,2,3,9,69,3,3,9,5,3,
+       10,62,5,3,14,4,4,9,88,4,2,7,6,3,8,80,4,2,13,11,4,5,30,3,3,5,2,3,
+       6,83,5,1,10,23,4,8,84,3,2,7,6,3,6,78,4,2,11,11,3,8,79,2,1,7,10,3,
+       6,62,4,3,9,8,3,10,37,3,1,7,2,3,8,71,4,1,10,7,3,7,52,4,1,12,8,4,
+       5,48,6,5,8,4,3,6,75,4,1,10,24,3,10,35,4,1,6,9,2,8,85,4,1,9,10,2,
+       5,86,3,1,6,12,2,5,86,7,2,13,18,2,7,79,7,4,9,25,3,7,79,5,2,8,6,2,
+       6,68,6,2,11,14,3,8,40,4,3,6,5,2)
+
+dados = matrix(dt,ncol = 7, byrow = TRUE)
+colnames(dados) = c("wind","solar_radiation","CO","NO","NO2","O3","HC")
+S_cov = cov(dados)
+S_cor = cor(dados)
+kable(dados)
+```
+
+\newpage
+
+
+As seguintes questões são feitas no livro: 
+
+(a) Resumir os dados em em menos de 7 dimensões (se possível) através de análise de componentes principais utilizando a matrix de covariâncias S e apresentar suas conclusões.
+
+Vale notar que vamos optar por normalizar os dados já que estao em escalas diferentes que podem acabar se distoando somente pela forma de medida (como no exemplo acima a radiação solar)
+
+```{r echo=FALSE}
+pca_resultados = prcomp(S_cov,center = T, scale. = T)
+
+names = c("PC1","PC2","PC3","PC4","PC5","PC6","PC7")
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+var_exp = setNames((var_exp),names)
+
+kable(pca_resultados$x)
+```
+
+
+```{r echo=FALSE}
+plot(var_exp, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+```
+
+```{r echo=FALSE}
+var_exp
+```
+
+
+```{r echo=FALSE}
+cat("As 3 primeiras componentes explicam:",sum(var_exp[1:3]))
+```
+
+\newpage
+(b) Resumir os dados em em menos de 7 dimensões (se possível) através de análise de componentes principais utilizando a matrix de correlações R e apresentar suas conclusões.
+
+```{r echo=FALSE}
+pca_resultados = prcomp(S_cor,center = T, scale. = T)
+
+names = c("PC1","PC2","PC3","PC4")
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+var_exp = setNames((var_exp),names)
+
+kable(pca_resultados$x)
+```
+
+
+```{r echo=FALSE}
+plot(var_exp, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+```
+
+```{r echo=FALSE}
+
+var_exp
+```
+
+
+```{r echo=FALSE}
+cat("As 3 primeiras componentes explicam:",sum(var_exp[1:3]))
+```
+
+\newpage
+
+(c) A escolha da matriz para análise faz alguma diferença? Explique. 
+
+A matriz de correlação é calculada a partir da matriz de dados original, dividindo cada valor pelo desvio padrão da variável correspondente. Isso permite que todas as variáveis tenham a mesma escala, o que é importante quando se deseja avaliar a correlação entre elas. Quando a matriz de correlação é usada no PCA, as componentes principais resultantes são ortogonais e não estão correlacionadas entre si.
+
+Por outro lado, a matriz de covariância é calculada a partir da matriz de dados original, sem ajustes para diferentes escalas. Isso significa que as variáveis com variações maiores terão mais peso na análise do que as variáveis com variações menores. Quando a matriz de covariância é usada no PCA, as componentes principais resultantes também são ortogonais, mas podem estar correlacionadas entre si.
+
+Em resumo, a principal diferença entre o PCA com matriz de correlação e o PCA com matriz de covariância está na maneira como as variáveis são escalonadas antes da análise. Se as variáveis tiverem diferentes escalas, é importante usar a matriz de correlação para garantir que todas as variáveis tenham o mesmo peso na análise. Se as variáveis estiverem na mesma escala ou se a escala não for um problema, a matriz de covariância pode ser usada.
+
+(D) Os dados podem ser resumidos em 3 ou menos dimensões?
+
+Como podemos percerber tanto com a matriz de covariancia quanto a matriz de corelções explicam bem a variancia dos dados em 3 componentes. Contudo vale ressaltar que a matriz de correlçoes explica menos com 3 PCs que a matriz de covariancia (85% vs 93%).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
