@@ -1,23 +1,33 @@
-pacman::p_load(Matrix,expm,tidyverse)
-
+pacman::p_load(Matrix,expm,tidyverse,reshape2)
+options(scipen = 99)
 ##### Questao 1 ----
 x <- matrix(c(4, -2, 2, -2, 
               -2, 5, 1, 2, 
               2, 1, 3, 0, 
               -2, 2, 0, 6), nrow = 4, ncol = 4)
-
+x_scale = scale(x,scale = TRUE,center = TRUE)
 # Calcular a matriz inversa da raiz quadrada de S
-S_inv_sqrt <- solve(sqrtm(cov(x)))
+S_inv_sqrt = solve(sqrtm(cov(x_scale)))
 
 # Imprimir a matriz S_inv_sqrt
-z = x * S_inv_sqrt 
+z = x_scale %*% S_inv_sqrt 
 
-cov_teste = cov(z)
+# Cálculo da matriz de covariância amostral
+S <- cov(x)
 
-prcomp(z)
+# Transformação de Mahalanobis
+z <- solve(x %*% S %*% t(x)) 
 
-round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),2)
+pca_resultados = prcomp(z)
 
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+plot(var_exp, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+
+pca_resultados = prcomp(diag(1,11))
+var_exp = round((pca_resultados$sdev^2)/sum(pca_resultados$sdev^2),4)
+
+plot(var_exp, type="o", xlab="Componente Principal", ylab="Proporção da Variância Explicada")
+var_exp
 ##### Questao 2 ----
 #dados
 dt = c(8,98,7,2,12,8,2,7,107,4,3,9,5,3,7,103,4,3,5,6,3,10,88,5,2,8,15,4,
@@ -90,9 +100,47 @@ plot(var.prop, type="o", xlab="Componente Principal", ylab="Proporção da Vari�
 round(var.prop,2)
 
 
+#########################
+# Carregando as bibliotecas necessárias
+library(tidyverse)
+library(magrittr)
+
+dados = cov(dados)
+
+# Análise de PCA utilizando SVD
+svd_resultado <- svd(scale(dados,scale = TRUE, center = TRUE))
+
+# Extraindo as cargas ajustadas
+cargas_ajustadas <- svd_resultado$v %*% diag(svd_resultado$d) / sqrt(ncol(dados) - 1)
+
+# Extraindo os valores próprios ajustados
+valores_ajustados <- (svd_resultado$d^2) / (nrow(dados) - 1)
+
+# Aplicando a análise de PCA com a função prcomp()
+pca_resultado <- prcomp(dados, scale. = TRUE,center = TRUE)
+
+# Extraindo as cargas da análise com prcomp()
+cargas_prcomp <- pca_resultado$rotation
+
+# Extraindo os valores próprios da análise com prcomp()
+valores_prcomp <- pca_resultado$sdev^2
+
+# Comparando as cargas
+print("Cargas obtidas manualmente:")
+print(svd_resultado$v)
+print("Cargas obtidas com prcomp():")
+print(pca_resultado$rotation)
+
+# Comparando os valores próprios
+print("Valores próprios obtidos manualmente:")
+print(valores_ajustados)
+print("Valores próprios obtidos com prcomp():")
+print(valores_prcomp)
 
 
+plot(pca_resultado$x[, 1], pca_resultado$x[, 2], main = "PCA", xlab = "PC1", ylab = "PC2")
+plot(svd_resultado$u[, 1], svd_resultado$u[, 2], main = "SVD", xlab = "U1", ylab = "U2")
 
-
-
-
+#pq nao sao iguais ( nao estao na mesma escala?)
+pca_resultado$x
+svd_resultado$u
