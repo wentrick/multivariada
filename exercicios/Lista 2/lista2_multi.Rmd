@@ -39,13 +39,22 @@ Agora, queremos manipular essa equação para obter AB = BA. Para isso, podemos 
 $$
 ABAB = AB
 $$
+Se AB = BA podemos substituir na equação
 
+$$
+(AB)(BA) = AB \\
+$$
+$$
+A(BB)A = ABA = AB \\
+$$
 
+Se AB = BA podemos substituir novamente na equação.Sabendo que A e B sao idempotentes!
 $$
-ABAB - AB = 0
+(AB)A= (BA)A = B(AA) = BA = AB \\
 $$
+Como $A$ e $B$ sao idempotentes, temos:
 $$
-AB(AB - I) = 0
+A 
 $$
 
 Para essa equacao ser igual a zero temos duas opceos:
@@ -65,6 +74,7 @@ Vamos abrir o quadrado
 $$
  I^2 - IA - AI + A^2 = I - A
 $$
+
 $$
  I - 2A + A^2 = I - A
 $$
@@ -82,7 +92,35 @@ $$
 (I - A)^2 = (I - A)
 $$
 
+### Provar o seguinte teorema: 
+
+Seja $X(n×k)$ tal que $rank(X) = k < n$. Então, $P_X = X(X^tX)^{-1}X^t$ é idempotente e simétrica e consequentemente, uma matriz projeção ortogonal.
 
 
+Vamos mostrat que é idempotente, para isso temos que mostrar que $(P_X)^2=P_X$
+$$
+(P_X)^2 = [X(X^tX)^{-1}X^t][X(X^tX)^{-1}X^t]
+$$
+$$
+(P_X)^2 = X(X^tX)^{-1}X^tX(X^tX)^{-1}X^t
+$$
 
+$$
+(P_X)^2 = X(X^tX)^{-1}[X^tX(X^tX)^{-1}]X^t
+$$
+$$
+(P_X)^2 = X(X^tX)^{-1}IX^t = X(X^tX)^{-1}X^t = (P_X)
+$$
+Agora vamos mostrar que é simetrica. Uma matriz é simétrica se sua transposta é igual a ela mesma. Vamos mostrar que $(P_X)^T = P_X$.
+
+$$
+(P_X)^T = [X(X^TX)^{-1}X^T]^T
+$$
+$$
+(P_X)^T = (X^T)[(X^TX)^{-1}]^TX^T
+$$
+
+$$
+(P_X)^T = X^T[(X^TX)^{-1}]^TX
+$$
 
