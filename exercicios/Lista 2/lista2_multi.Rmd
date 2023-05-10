@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### Provar o seguinte teorema: Sejam $A$ e $B$ matrizes idempotentes. Então,
+### 8) Provar o seguinte teorema: Sejam $A$ e $B$ matrizes idempotentes. Então,
 (a) $A + B$ é idempotente somente quando $AB = BA = 0$.
 
 $$
@@ -92,9 +92,9 @@ $$
 (I - A)^2 = (I - A)
 $$
 
-### Provar o seguinte teorema: 
+### 9) Provar o seguinte teorema: 
 
-Seja $X(n×k)$ tal que $rank(X) = k < n$. Então, $P_X = X(X^tX)^{-1}X^t$ é idempotente e simétrica e consequentemente, uma matriz projeção ortogonal.
+Seja $X(n \times x)$ tal que $rank(X) = k < n$. Então, $P_X = X(X^tX)^{-1}X^t$ é idempotente e simétrica e consequentemente, uma matriz projeção ortogonal.
 
 
 Vamos mostrat que é idempotente, para isso temos que mostrar que $(P_X)^2=P_X$
@@ -117,10 +117,94 @@ $$
 (P_X)^T = [X(X^TX)^{-1}X^T]^T
 $$
 $$
-(P_X)^T = (X^T)[(X^TX)^{-1}]^TX^T
+(P_X)^T = (X^T)[(X^TX)^{-1}]^TX
 $$
 
 $$
 (P_X)^T = X^T[(X^TX)^{-1}]^TX
 $$
+$$
+(P_X)^T = X^T[(X^TX)^{T}]^{-1}X
+$$
+$$
+(P_X)^T = X^T[XX^T]^{-1}X
+$$
+
+
+
+$$
+(P_X)^T = X^T[X^{-1}(X^T)^{-1}]X
+$$
+$$
+(P_X)^T = X^T[X^{-1}(X^{-1})^{T}]X
+$$
+
+### 10) Utilizando o R: verifique, através de exemplos, que uma matriz de projeção tem autovalores somente no conjunto {0, 1}. A demonstração pode ser feita utilizando a equação característica e lembrando que se $M$ é uma matriz de projeção, então $M = M^2 = M^T$.
+
+```{r}
+
+```
+
+
+### 11) Seja X uma matriz de dados $(n \times p)$ com matriz de covariância S. Sejam $\lambda_1, . . . , \lambda_p$ os autovalores de S.
+
+(a) Mostre que a soma das variâncias $s_{ii}$ de X (variação amostral total) é dada por $\lambda_1 + . . . + \lambda_p$
+
+Para provar que a soma das variâncias $s_{ii}$ de $X$ é igual a $\lambda_1 + ... + \lambda_p$, vamos analisar a relação entre os autovalores da matriz de covariância $S$ e as variâncias dos dados.
+
+A matriz de covariância S é definida como a matriz simétrica (p × p) cujos elementos $S_{ij}$ são dados pela fórmula:
+
+
+$$
+S_{ij} = cov(x_i, x_j)
+$$
+
+Onde $x_i$ e $x_j$ são as colunas correspondentes nos dados da matriz $X$, e $cov(x_i, x_j)$ é a covariância entre essas duas variáveis.
+
+A variância de uma variável $x_i$ é dada pelo elemento $S_{ii}$ da matriz de covariância $S$. Portanto, podemos escrever:
+
+$$
+Var(xi) = S_{ii}
+$$
+
+A soma das variâncias $s_{ii}$ de $X$ é dada por:
+
+$$
+s_{11} + s_{22} + ... + s_{pp}
+$$
+
+No entanto, os elementos da matriz de covariância S são os autovalores multiplicados pelos seus correspondentes autovetores. Assim, podemos expressar os elementos da matriz de covariância $S$ como:
+
+$$
+S_{ii} = \lambda_i \times u_i \times u_i
+$$
+
+Onde $\lambda_i$ é o i-ésimo autovalor e $u_i$ é o i-ésimo autovetor de $S$.
+
+Substituindo essa expressão na soma das variâncias $s_{ii}$ de $X$, temos:
+
+$$
+s_{11} + s_{22} + ... + s_{pp} = (\lambda_1 \times u_1 \times u_1) + (\lambda_2 \times u_2 \times u_2) + ... + (\lambda_p \times u_p \times u_p)
+$$
+
+Agora, perceba que os autovetores $u_i$ são vetores unitários, ou seja, têm norma igual a 1. Portanto, podemos simplificar a expressão acima:
+
+$$
+s_{11} + s_{22} + ... + spp = (\lambda_1 \times 1 \times 1) + (\lambda_2 \times 1 \times 1) + ... + (\lambda_p \times 1 \times 1)
+$$
+
+$$
+s_{11} + s_{22} + ... + s_{pp} = \lambda_1 + \lambda_2 + ... + \lambda_p
+$$
+
+Assim, concluímos que a soma das variâncias sii de $X$ (variação amostral total) é igual a $\lambda_1 + ... + \lambda_p$.
+
+
+(b) Mostre que a variância amostral generalizada é dada por $\lambda_1 \times . . . \times \lambda_p$.
+(c) Mostre que a variância amostral generalizada se anula se as colunas de $X$ somarem zero.
+
+
+
+
+
 
