@@ -68,10 +68,18 @@ matriz_A %*% matriz_medias
 matriz_A %*% sigma_x %*% t(matriz_A)
 
 
+covA = cov(matriz_A)
 
+eigenA = eigen(covA)
 
+covA %*% diag(eigenA$values)
 
+eigenA$vectors %*% diag(eigenA$values) %*% t(eigenA$vectors)
+eigenA$vectors[2,] %*% diag(eigenA$values)[,2] %*% t(eigenA$vectors)[,2]
+covA %*% eigenA$vectors
+eigenA$vectors %*% diag(eigenA$values)
 
+matriz_A %*% t(matriz_A)
 
 #### Questao 3 ----
 dados = c(32, 1.59, 2738.86, 4.2, 24.1
