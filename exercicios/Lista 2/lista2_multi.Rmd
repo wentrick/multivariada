@@ -156,7 +156,7 @@ A matriz de covariância S é definida como a matriz simétrica (p × p) cujos e
 
 
 $$
-S_{ij} = cov(x_i, x_j)
+S_{ij} = cov(X_i, X_j) = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(X_j - \bar{X})}{n}
 $$
 
 Onde $x_i$ e $x_j$ são as colunas correspondentes nos dados da matriz $X$, e $cov(x_i, x_j)$ é a covariância entre essas duas variáveis.
@@ -164,7 +164,7 @@ Onde $x_i$ e $x_j$ são as colunas correspondentes nos dados da matriz $X$, e $c
 A variância de uma variável $x_i$ é dada pelo elemento $S_{ii}$ da matriz de covariância $S$. Portanto, podemos escrever:
 
 $$
-Var(xi) = S_{ii}
+S_{ii} = \frac{\sum_{i=1}^{n}(X_i - \bar{X})(X_i - \bar{X})}{n} = \frac{\sum_{i=1}^{n}(X_i - \bar{X})^2}{n} =  Var(X_i) 
 $$
 
 A soma das variâncias $s_{ii}$ de $X$ é dada por:
@@ -175,27 +175,59 @@ $$
 
 No entanto, os elementos da matriz de covariância S são os autovalores multiplicados pelos seus correspondentes autovetores. Assim, podemos expressar os elementos da matriz de covariância $S$ como:
 
-$$
-S_{ii} = \lambda_i \times u_i \times u_i
-$$
 
-Onde $\lambda_i$ é o i-ésimo autovalor e $u_i$ é o i-ésimo autovetor de $S$.
-
-Substituindo essa expressão na soma das variâncias $s_{ii}$ de $X$, temos:
+Sabemos pela definicao de autovetores e autovalores que eles seguem a seguinte equacao:
 
 $$
-s_{11} + s_{22} + ... + s_{pp} = (\lambda_1 \times u_1 \times u_1) + (\lambda_2 \times u_2 \times u_2) + ... + (\lambda_p \times u_p \times u_p)
+SA =  \lambda A
 $$
-
-Agora, perceba que os autovetores $u_i$ são vetores unitários, ou seja, têm norma igual a 1. Portanto, podemos simplificar a expressão acima:
-
-$$
-s_{11} + s_{22} + ... + spp = (\lambda_1 \times 1 \times 1) + (\lambda_2 \times 1 \times 1) + ... + (\lambda_p \times 1 \times 1)
-$$
+Onde S é a nossa matriz de dados, A é nossa matriz de autovetores de S e $\lambda$ é nossos autovalores. Em seguida podemos calcular a variancia dos pontos projetados sobre os autovetores A
 
 $$
-s_{11} + s_{22} + ... + s_{pp} = \lambda_1 + \lambda_2 + ... + \lambda_p
+Var(SA) = \frac{\sum_{i=1}^{n}\sum_{j=1}^{k}(X_{ij}A_j - \mu)^2}{n}
 $$
+Podemos centralizar nossos dados (absorvendo a media para dentro da variavel) deixando com média 0:
+$$
+\mu = \frac{\sum_{i=1}^{n}\sum_{j=1}^{k}(X_{ij}A_j)}{n} = \frac{1}{n}\sum_{j=1}^{k}(\sum_{i=1}^{n}X_{ij})A_j = \sum_{j=1}^{k}(\frac{1}{n}\sum_{i=1}^{n}X_{ij})A_j
+$$
+Podemos perceber que se centralizarmos os dados, ou seja subtarair a média, nossa media será zero. Isso acontece pois na equacao que chemaos estamos tirando as medias $S_{.j}$ para cada j o que no caso encontrariamos 0 pois centralizamos os dados diminuindo sua media da coluna. 
+
+Podemos continuir densenvolvendo a conta abrindo esse quadrado:
+$$
+Var(SA) = \frac{1}{n}\sum_{i=1}^{n}(\sum_{j=1}^{k}(X_{ij}A_j)\sum_{d=1}^{k}(X_{id}A_d)
+$$
+Vamos chamar cada somatorio com uma letra diferente para nao se confundir(eles sao a mesma coisa!!!)
+
+Podemos reorganizar a soma da seguinte forma, colocando os somatorios com i para dentro junto com o $1/n$ e os que depende de $j$ e $a$ para fora 
+$$
+Var(SA) = \sum_{d=1}^{k}\sum_{j=1}^{k}(\frac{1}{n}\sum_{i=1}^{n}X_{id}X_{ij})A_dA_j
+$$
+Pode se perceber que o temos que encontramos entre parenteses nada mais é do que a covariancia entre 2 variaveis que tem média 0:
+$$
+Var(SA) = \sum_{d=1}^{k}(\sum_{j=1}^{k}cov(X_d,X_j)A_j)A_d
+$$
+Vale notar que estamos multiplicando a $Cov(S_d,S_J)$ por um autovetor j da matriz A. Pela relacao $SA = A \lambda$. Sabmos que isso deve ser igual a:
+
+$$
+\sum_{j=1}^{k}cov(X_d,X_j)A_j =  \lambda A_d
+$$
+Agora podemos substituir isso na equcao anterior:
+
+
+$$
+Var(SA) = \sum_{d=1}^{k}(\lambda A_d)A_d
+$$
+
+$$
+Var(SA) = \sum_{d=1}^{k}\lambda (A_dA_d)
+$$
+Sabemoss que os autovetore sao vetores unitarios logo esse produto interno é igual a 1 
+
+$$
+Var(SA) = \sum_{d=1}^{k}\lambda 
+$$
+O que acabamos de fazer é calcular a variancia de $XA$ que é a variancia da projecao dos valores de X sobre a matriz de autovetores A.
+
 
 Assim, concluímos que a soma das variâncias sii de $X$ (variação amostral total) é igual a $\lambda_1 + ... + \lambda_p$.
 
