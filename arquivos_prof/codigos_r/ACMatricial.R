@@ -5,8 +5,10 @@
 ###  EXEMPLO SLIDES - COR DOS OLHOS E CABELOS
 
 #### NBasica ####
-
 library(ca)
+library(tidyverse)
+library(FactoMineR)
+library(factoextra)
 # (M <- matrix(c(1, 3, 2, 2, 2, 3), 2, 3, byrow = T))
 
 (M <- matrix(c(326,  38, 241, 110,   3,
@@ -211,3 +213,4 @@ fviz_ca_biplot(fac.ca,arrow=c(F,T),axes=c(1,2))
 fviz_screeplot(fac.ca) +
   geom_hline(yintercept = 10.00, linetype = 2, 
              color = "blue")
+

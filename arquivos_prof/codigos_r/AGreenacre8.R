@@ -1,4 +1,4 @@
-
+pacman::p_load(rgl,webshot2,ade4)
 #### ANALISE MULTIVARIADA 
 #### ANALISE DE CORRESPONDENCIAS 
 ###  PROF. GEORGE VON BORRIES
@@ -32,23 +32,23 @@ round(rowSums(viagens)/sum(viagens),2)
 require(rgl)
 
 # (z,x,y)
-rgl.lines(c(0,1.2), c(0,0),   c(0,0))
-rgl.lines(c(0,0)  , c(0,1.2), c(0,0))
-rgl.lines(c(0,0)  , c(0,0),   c(0,1.2))
+segments3d(c(0,1.2), c(0,0),   c(0,0))
+segments3d(c(0,0)  , c(0,1.2), c(0,0))
+segments3d(c(0,0)  , c(0,0),   c(0,1.2))
 
-rgl.lines(c(0,0), c(0,1), c(1,0), size = 2)
-rgl.lines(c(0,1), c(1,0), c(0,0), size = 2)
-rgl.lines(c(0,1), c(0,0), c(1,0), size = 2)
+segments3d(c(0,0), c(0,1), c(1,0), size = 2)
+segments3d(c(0,1), c(1,0), c(0,0), size = 2)
+segments3d(c(0,1), c(0,0), c(1,0), size = 2)
 
-rgl.points(pL[,3], pL[,1], pL[,2], size = 4)
-rgl.texts(pL[,3], pL[,1], pL[,2], text = rownames(pL))
-rgl.texts(matrix(c(0,1.25,0, 0,0,1.25,1.4,0,0), 
+points3d(pL[,3], pL[,1], pL[,2], size = 4)
+text3d(pL[,3], pL[,1], pL[,2], text = rownames(pL))
+text3d(matrix(c(0,1.25,0, 0,0,1.25,1.4,0,0), 
                  byrow = T, ncol = 3), 
           text = colnames(pL), col = "cyan")
-rgl.points(0.49,0.15,0.36, size = 4, col="yellow")
+points3d(0.49,0.15,0.36, size = 4, col="yellow")
 
 # Para salva o grafico
-# rgl.snapshot("c://001-dados//imagem2-4.png","png")
+snapshot3d( filename = "teste.png", fmt = "png", top = TRUE,width = 1000,height = 1000 )
 
 
 #### AC:EXEMPLO LEITURA ####
@@ -104,3 +104,4 @@ triangle.plot(leitor.pro.df, label = row.names(leitor.pro),
 (n <- sum(leitor.colsum))
 
 (inercia <- chi2/sum(leitor.colsum))
+
