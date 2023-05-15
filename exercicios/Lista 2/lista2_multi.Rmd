@@ -229,10 +229,14 @@ $$
 O que acabamos de fazer é calcular a variancia de $XA$ que é a variancia da projecao dos valores de X sobre a matriz de autovetores A.
 
 
-Assim, concluímos que a soma das variâncias sii de $X$ (variação amostral total) é igual a $\lambda_1 + ... + \lambda_p$.
+Assim, concluímos que a soma das variâncias s_{ii} de $X$ (variação amostral total) é igual a $\lambda_1 + ... + \lambda_p$.
 
 
 (b) Mostre que a variância amostral generalizada é dada por $\lambda_1 \times . . . \times \lambda_p$.
+
+Sabmoes que a variancia de $S_{ii} = $
+
+
 (c) Mostre que a variância amostral generalizada se anula se as colunas de $X$ somarem zero.
 
 
