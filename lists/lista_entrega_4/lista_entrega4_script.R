@@ -37,10 +37,6 @@ cbind(round(perfil_coluna,2),média = round(rowSums(tabela_contingencia)/sum(tab
 #calculando os valores esperados 
 (valor_esperado =  rowSums(tabela_contingencia)%o%colSums(tabela_contingencia)/sum(tabela_contingencia))
 
-
-
-
-
 #### xxxx EL.Qui-Quadrado e Inercia ####
 
 (chi2 <- sum((tabela_contingencia-valor_esperado)^2/valor_esperado))

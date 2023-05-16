@@ -1,0 +1,104 @@
+---
+title: "Lista Entrega 4"
+author: "Davi Wentrick Feijó"
+date: "2023-05-15"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,vcd,FactoMineR,factoextra,ca,knitr)
+data("Suicide")
+```
+
+### Exercício 41 da Lista 5 
+
+O pacote vcd do R possui dados sobre sobre suicídio na Alemanha Ocidental obtidos de Heuer, J., 1979 (Suicide by children and youth). O arquivo possui 306 observações e 6 variáveis
+
+
+
+Realize uma análise de correspodências para com as variáveis method e age.group.
+
+(2.5) Indique cada etapa de seu estudo e respectivas conclusões. (a)
+
+As 6 primeiras observacoes do banco
+```{r echo=FALSE}
+kable(head(Suicide))
+```
+
+A tabela de contingencia
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+tabela_contingencia = as.data.frame(Suicide) %>%
+  select(1,3,5) %>%
+  group_by(age.group,method)%>%
+  summarise(freq = sum(Freq)) %>%
+  pivot_wider(names_from = method, values_from = freq)
+
+tabela_contingencia = as.data.frame(tabela_contingencia) %>%
+  ungroup() %>%
+  select(-1)
+
+names = c("10-20", "25-35", "40-50", "55-65", "70-90")
+
+rownames(tabela_contingencia) = names
+kable(tabela_contingencia)
+```
+
+\newpage
+Os perfis de Linha 
+
+```{r echo=FALSE}
+## Calculando perfis de linha e coluna 
+
+perfil_linha = tabela_contingencia/rowSums(tabela_contingencia) #proporcao em relacao ao total das linhas
+
+kable(rbind(round(perfil_linha,2),média = round(colSums(tabela_contingencia)/sum(tabela_contingencia),2)))
+```
+Os perfis Coluna
+
+```{r echo=FALSE}
+perfil_coluna = t(t(tabela_contingencia)/colSums(tabela_contingencia))#proporcao em relacao ao total das colunas 
+
+kable(cbind(round(perfil_coluna,2),média = round(rowSums(tabela_contingencia)/sum(tabela_contingencia),2)))
+```
+
+Os valores esperados 
+```{r echo=FALSE}
+#calculando os valores esperados 
+valor_esperado =  rowSums(tabela_contingencia)%o%colSums(tabela_contingencia)/sum(tabela_contingencia)
+
+kable(valor_esperado)
+```
+
+(2.5) Calcule e interprete a estatística Qui-Quadrado e a Inércia Total. (b)
+
+```{r echo=FALSE}
+chi2 <- sum((tabela_contingencia-valor_esperado)^2/valor_esperado)
+gl <- (nrow(tabela_contingencia)-1)*(ncol(tabela_contingencia)-1)
+pchi2 <- 1 - pchisq(chi2,gl)
+```
+```{r echo=FALSE}
+cat("A estatistica qui-quadrado foi:",chi2,"com",gl,"graus de liberdade, e o p-valor foi de:",pchi2)
+```
+
+
+```{r echo=FALSE}
+n <- sum(tabela_contingencia)
+inercia <- chi2/sum(colSums(tabela_contingencia))
+```
+```{r echo=FALSE}
+cat("A inercia dos dados é:",inercia)
+```
+
+(2.5) Análise os resíduos em cada célula da tabela e interprete os resultados. (c)
+
+```{r echo=FALSE}
+residuos = round(tabela_contingencia - valor_esperado,2)
+kable(residuos)
+```
+
+
+
+(2.5) Apresente um mapa de correspondências e faça um breve resumo dos resultados (d)
+gerais da análise.
