@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,vcd,FactoMineR,factoextra,ca,knitr)
+pacman::p_load(tidyverse,vcd,FactoMineR,factoextra,ca,knitr,matrix)
 data("Suicide")
 ```
 
@@ -46,7 +46,7 @@ kable(tabela_contingencia)
 ```
 
 \newpage
-Os perfis de Linha 
+Os perfis das linhas
 
 ```{r echo=FALSE}
 ## Calculando perfis de linha e coluna 
@@ -55,7 +55,7 @@ perfil_linha = tabela_contingencia/rowSums(tabela_contingencia) #proporcao em re
 
 kable(rbind(round(perfil_linha,2),média = round(colSums(tabela_contingencia)/sum(tabela_contingencia),2)))
 ```
-Os perfis Coluna
+Os perfis das colunas
 
 ```{r echo=FALSE}
 perfil_coluna = t(t(tabela_contingencia)/colSums(tabela_contingencia))#proporcao em relacao ao total das colunas 
@@ -78,6 +78,7 @@ chi2 <- sum((tabela_contingencia-valor_esperado)^2/valor_esperado)
 gl <- (nrow(tabela_contingencia)-1)*(ncol(tabela_contingencia)-1)
 pchi2 <- 1 - pchisq(chi2,gl)
 ```
+
 ```{r echo=FALSE}
 cat("A estatistica qui-quadrado foi:",chi2,"com",gl,"graus de liberdade, e o p-valor foi de:",pchi2)
 ```
@@ -87,6 +88,7 @@ cat("A estatistica qui-quadrado foi:",chi2,"com",gl,"graus de liberdade, e o p-v
 n <- sum(tabela_contingencia)
 inercia <- chi2/sum(colSums(tabela_contingencia))
 ```
+
 ```{r echo=FALSE}
 cat("A inercia dos dados é:",inercia)
 ```
@@ -97,8 +99,18 @@ cat("A inercia dos dados é:",inercia)
 residuos = round(tabela_contingencia - valor_esperado,2)
 kable(residuos)
 ```
+Podemos perceber que a coluna hang apresenta valores bem discrepantes entre o gtupos mais jovens dos mais velhos. O mesmo pode ser observado nas categorias poison e toxicgas. No geral podemos perceber que as diferencas nos residuos seguem um padrao de oposição entre jovens e idosos.
 
-
-
+\newpage
 (2.5) Apresente um mapa de correspondências e faça um breve resumo dos resultados (d)
 gerais da análise.
+
+```{r echo=FALSE}
+resultado_ca <- CA(tabela_contingencia,graph = FALSE)
+
+fviz_ca_biplot(resultado_ca)
+```
+
+Podemos ver que os grupos de (10-20) e (25-35) tem comportamento muito iguais, os pontos praticamente se sobrepoem,vale notar que  um comportamente parecido mas nao tao forte é visivel com os grupos de (55-65) e (70-90). Em relação aos metodos podemos perceber que o grupo mais velhos estao mais correlacionado com enforcamento, afogamento e facas. Já o grupo mais novo podemos ver uma tendencia oposta estando mais correlacionado com envenenamento e armas.
+
+
