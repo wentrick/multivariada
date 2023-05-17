@@ -1,0 +1,96 @@
+---
+title: "Exercicio Extra lista 4"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-05-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,readr,fastDummies,factoextra)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+student_mat <- read_delim("student-mat.csv", 
+                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+student_por <- read_delim("student-por.csv", 
+                          delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+selected_cols = c("school", "sex", "address", "famsize", "Pstatus", "Mjob", 
+                      "Fjob", "reason", "guardian", "schoolsup", "famsup", "paid",
+                      "activities", "nursery", "higher", "internet", "romantic" )
+
+```
+### Sobre o Artigo
+
+O artigo fala sobre a Mineração de Dados Educacionais (EDM) que é uma área que busca processar e interpretar dados educacionais para obter conhecimento útil. Um dos principais objetivos da EDM é prever o desempenho dos alunos. No entanto, a alta dimensionalidade dos conjuntos de dados educacionais pode dificultar a análise e a precisão das previsões (Cruse of Dimensionality). Portanto, este estudo propõe o uso da Análise de Componentes Principais (PCA) como uma técnica para reduzir a dimensionalidade dos dados e extrair conhecimento relevante. O PCA é uma técnica bem conhecida que captura a variabilidade dos dados usando poucas dimensões. O estudo também utiliza dois modelos de classificação populares, Máquinas de Vetores de Suporte e Naive Bayes, para realizar as previsões de desempenho dos alunos. Os resultados experimentais mostraram a eficácia do método proposto. Este estudo contribui para o uso do PCA na análise de dados educacionais e na redução da dimensionalidade para tarefas de previsão de desempenho dos alunos.
+
+### Sobre o banco utilizado
+
+Os conjuntos de dados descrevem as realizações dos alunos no ensino médio de duas escolas portuguesas em relação a duas disciplinas: Português e Matemática. Os atributos dos dados incluem notas dos alunos, seus registros demográficos, sociais, financeiros, pessoais e acadêmicos. Esses dados foram coletados por meio de relatórios escolares e questionários. O primeiro conjunto de dados (Dataset I) contém 649 alunos da disciplina de Português e é descrito por 33 atributos. O segundo conjunto de dados (Dataset II) é caracterizado pelos mesmos atributos e se refere às realizações finais dos alunos na disciplina de Matemática.
+
+A nota final é considerada como o atributo de classe, uma vez que estamos interessados em prever o desempenho dos alunos. Em seus estudos, Cortez e Silva relataram que o atributo de classe G3 apresenta alta correlação com os atributos G2 e G1. Isso ocorre porque G3 é a nota do último ano (emitida no 3º período), enquanto G1 e G2 correspondem às notas do primeiro e segundo períodos.
+
+### Tratamento de dados para aplicação da PCA
+
+O objetivo desta etapa é preparar os dados brutos em uma forma adequada que permita a aplicação das técnicas de aprendizado de máquina. Uma análise preliminar nas instâncias de dados e nos atributos dos Conjuntos de Dados I e II mostrou que é necessária alguma forma de pré-processamento, uma vez que os atributos são de diferentes tipos (binários, numéricos e nominais). Primeiro, as instâncias de dados com valores ausentes são removidas, para que possamos lidar com dados consistentes.
+Em seguida, como existem atributos nominais, cada um deles é transformado em variáveis dummy, que podem ser definidas como atributos binários que podem assumir o valor "0" ou "1" para indicar a ausência ou presença de um valor categórico específico. 
+
+\newpage
+### Analise das notas de Mátematica
+```{r echo=FALSE}
+#dataset mat
+dummy_mat = student_mat %>%
+  drop_na() %>%
+  dummy_cols(select_columns = selected_cols) %>%
+  select(-c(1,2,4,5,6,9,10,11,12,16,17,18,19,20,21,22,23)) %>%
+  mutate(G3 = ifelse(G3 >= 10,1,0))
+  
+
+results = prcomp(dummy_mat)
+
+var_explained_mat = results$sdev^2 / sum(results$sdev^2)
+
+
+fviz_eig(results)
+
+
+round(var_explained_mat[1:10]*100,3)
+```
+
+
+```{r echo=FALSE}
+head(student_mat)
+```
+
+\newpage
+
+### Analise das notas de Portugues
+```{r echo=FALSE}
+#dataset port
+
+dummy_por = student_por %>%
+  drop_na() %>%
+  dummy_cols(select_columns = selected_cols) %>%
+  select(-c(1,2,4,5,6,9,10,11,12,16,17,18,19,20,21,22,23)) %>%
+  mutate(G3 = ifelse(G3 >= 10,1,0))
+
+
+results = prcomp(dummy_por)
+
+var_explained_por = results$sdev^2 / sum(results$sdev^2)
+
+fviz_eig(results)
+
+round(var_explained_por[1:10]*100,3)
+
+```
+
+```{r echo=FALSE}
+head(student_por)
+
+```
+
+Dentro desse artigo foi usado o scree plot para ter um representaçaõ grafica da variancia de cada componente, uma alternativa pode ser mostrar a probabilidade cumulativa. Porém para esse tipo de gráfico nao tem muitas alternativas de representação.

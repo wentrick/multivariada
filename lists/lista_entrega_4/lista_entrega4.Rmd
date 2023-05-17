@@ -92,6 +92,8 @@ inercia <- chi2/sum(colSums(tabela_contingencia))
 ```{r echo=FALSE}
 cat("A inercia dos dados é:",inercia)
 ```
+Podemos perceber que pelo resultado do teste de qui-quadrado que nao há homogeneidade dos dados, indicando uma associacao entre as variaveis, e a inercia ela nos da uma ideia de quao forte é a relacao entre as variaveis age.group e method.
+
 
 (2.5) Análise os resíduos em cada célula da tabela e interprete os resultados. (c)
 
