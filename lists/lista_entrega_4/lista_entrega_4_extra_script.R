@@ -2,7 +2,7 @@ pacman::p_load(tidyverse,readr,fastDummies,factoextra)
 
 
 student_mat <- read_delim("data/dados_lista_extra/student-mat.csv", 
-                          +     delim = ";", escape_double = FALSE, trim_ws = TRUE)
+                               delim = ";", escape_double = FALSE, trim_ws = TRUE)
 
 student_por <- read_delim("data/dados_lista_extra/student-por.csv", 
                           delim = ";", escape_double = FALSE, trim_ws = TRUE)
@@ -50,4 +50,4 @@ fviz_eig(results)
 round(var_explained_por*100,3)
 
 
-
+fviz_biplot(results)
