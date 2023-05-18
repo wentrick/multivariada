@@ -68,7 +68,7 @@ round(var_explained_mat[1:10]*100,3)
 ```{r echo=FALSE}
 #biplot mat
 library(FactoMineR)
-results = PCA(dummy_mat,graph = FALSE)
+results = PCA(dummy_mat,graph = FALSE,scale.unit = F)
 
 fviz_pca_biplot(results,
                 label = "var",
@@ -111,7 +111,7 @@ round(var_explained_por[1:10]*100,3)
 ```{r echo=FALSE}
 #biplot por
 library(FactoMineR)
-results = PCA(dummy_por,graph = FALSE)
+results = PCA(dummy_por,graph = FALSE,scale.unit = F)
 
 fviz_pca_biplot(results,
                 label = "var",
@@ -121,4 +121,4 @@ fviz_pca_biplot(results,
                 select.var = list(contrib = 5)) #selecionando as 5 mais importantes
 ```
 
-Dentro desse artigo foi usado o scree plot para ter um representaçaõ grafica da variancia de cada componente, uma alternativa pode ser mostrar a probabilidade cumulativa. Porém para esse tipo de gráfico nao tem muitas alternativas de representação.
+Dentro desse artigo foi usado o scree plot para ter um representaçaõ grafica da variancia de cada componente, uma alternativa pode ser mostrar a probabilidade cumulativa. Porém para esse tipo de gráfico nao tem muitas alternativas de representação. Apesar de nao fazer parte do artigo podemos fazer um biplot dos dados. Vale notar que no artigo os dados nao foram normalizados, entao os graficos seguiram o mesmo padrao!

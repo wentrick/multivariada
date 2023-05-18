@@ -1,3 +1,4 @@
+#Os dados foram retirados desse site: https://archive-beta.ics.uci.edu/dataset/320/student+performance
 pacman::p_load(tidyverse,readr,fastDummies,FactoMineR,factoextra)
 
 
