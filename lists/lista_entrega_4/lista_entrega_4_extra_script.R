@@ -20,7 +20,7 @@ dummy_mat = student_mat %>%
   mutate(G3 = ifelse(G3 >= 10,1,0))
   
 
-results = prcomp(dummy_mat)
+results = prcomp(dummy_mat,scale. = F,center = T)
 
 var_explained_mat = results$sdev^2 / sum(results$sdev^2)
 
@@ -31,8 +31,8 @@ fviz_eig(results)
 round(var_explained_mat*100,3)
 
 #biplot mat
-results = PCA(dummy_mat)
-
+results = PCA(dummy_mat,scale.unit = F)
+fviz_eig(results)
 fviz_pca_biplot(results,
                 label = "var",
                 col.ind = "black",
@@ -61,7 +61,7 @@ round(var_explained_por*100,3)
 
 
 #biplot por
-results = PCA(dummy_por)
+results = PCA(dummy_por,scale.unit = F)
 
 results$var
 

@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,readr,fastDummies,factoextra)
+pacman::p_load(tidyverse,readr,fastDummies,FactoMinerR,factoextra)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -40,6 +40,11 @@ Em seguida, como existem atributos nominais, cada um deles é transformado em va
 
 \newpage
 ### Analise das notas de Mátematica
+
+```{r echo=FALSE}
+head(student_mat)
+```
+
 ```{r echo=FALSE}
 #dataset mat
 dummy_mat = student_mat %>%
@@ -60,14 +65,29 @@ fviz_eig(results)
 round(var_explained_mat[1:10]*100,3)
 ```
 
-
 ```{r echo=FALSE}
-head(student_mat)
+#biplot mat
+library(FactoMineR)
+results = PCA(dummy_mat,graph = FALSE)
+
+fviz_pca_biplot(results,
+                label = "var",
+                col.ind = "black",
+                col.var = "contrib",
+                gradient.cols = c("blue","green","red"),
+                select.var = list(contrib = 5)) #selecionando as 5 mais importantes
 ```
+
 
 \newpage
 
 ### Analise das notas de Portugues
+
+```{r echo=FALSE}
+head(student_por)
+
+```
+
 ```{r echo=FALSE}
 #dataset port
 
@@ -89,8 +109,16 @@ round(var_explained_por[1:10]*100,3)
 ```
 
 ```{r echo=FALSE}
-head(student_por)
+#biplot por
+library(FactoMineR)
+results = PCA(dummy_por,graph = FALSE)
 
+fviz_pca_biplot(results,
+                label = "var",
+                col.ind = "black",
+                col.var = "contrib",
+                gradient.cols = c("blue","green","red"),
+                select.var = list(contrib = 5)) #selecionando as 5 mais importantes
 ```
 
 Dentro desse artigo foi usado o scree plot para ter um representaçaõ grafica da variancia de cada componente, uma alternativa pode ser mostrar a probabilidade cumulativa. Porém para esse tipo de gráfico nao tem muitas alternativas de representação.
