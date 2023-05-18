@@ -1,4 +1,4 @@
-pacman::p_load(tidyverse,readr,fastDummies,factoextra)
+pacman::p_load(tidyverse,readr,fastDummies,FactoMineR,factoextra)
 
 
 student_mat <- read_delim("data/dados_lista_extra/student-mat.csv", 
@@ -30,6 +30,16 @@ fviz_eig(results)
 
 round(var_explained_mat*100,3)
 
+#biplot mat
+results = PCA(dummy_mat)
+
+fviz_pca_biplot(results,
+                label = "var",
+                col.ind = "black",
+                col.var = "contrib",
+                gradient.cols = c("blue","green","red"),
+                select.var = list(contrib = 5)) #selecionando as 5 mais importantes
+
 #dataset port
 
 dummy_por = student_por %>%
@@ -50,4 +60,17 @@ fviz_eig(results)
 round(var_explained_por*100,3)
 
 
-fviz_biplot(results)
+#biplot por
+results = PCA(dummy_por)
+
+results$var
+
+fviz_pca_biplot(results,
+                label = "var",
+                col.ind = "black",
+                col.var = "contrib",
+                gradient.cols = c("blue","green","red"),
+                select.var = list(contrib = 5)) #selecionando as 5 mais importantes
+
+
+
