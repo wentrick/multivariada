@@ -1,0 +1,154 @@
+---
+title: "Decomposição Espectral, SVD e PCA"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-05-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,knitr)
+set.seed(420)
+```
+
+### Decomposição Espectral
+
+A decomposição espectral consiste em decompor uma matriz A no produto de 3 matrizes da seguinte forma:
+
+$$
+A_{n \times n} = P_{n \times n} D_{n \times n} P_{n \times n}^{T}
+$$
+
+
+Onde P é uma matriz onde as cada coluna é composta por um autovetor de A e D e uma matriz diagonal com os autovalores correspondentes a cada autovetor de A.
+
+Podemos realizar isso dentro do R por meio da função eigen(). Vamos utilizar a seguinte matriz e usaremos a matriz de covariancia dela (com isso garantimos que ela é positiva definida)
+
+```{r echo=FALSE}
+dados <- matrix(round(runif(16,min = 0,max = 30), 0),nrow = 4)
+A = cov(dados)
+kable(A)
+```
+
+Aqui vamos fazer nossa decomposicao, o resultado saira como um objeto onde \$vectors é nosso P e \$values é a matriz D (temos que usar a função diag() para que tenhamos a matriz diagona pois o resultado sai em um vetor)
+```{r}
+spectral_decomposition = eigen(A)
+```
+
+```{r}
+P = spectral_decomposition$vectors
+```
+
+```{r echo=FALSE}
+kable(P)
+```
+
+```{r}
+D = diag(spectral_decomposition$values)
+```
+
+```{r echo=FALSE}
+kable(D)
+```
+
+Podemos confimar a decomposição tentando obter a matriz A novamente
+
+```{r}
+A_recuperado = P %*% D %*% solve(P)
+```
+
+```{r echo=FALSE}
+kable(A_recuperado)
+```
+
+Vale notar que quando A é simetrica $P^{-1} = P^{T}$
+
+```{r}
+P_transposto = t(P)
+```
+
+```{r echo=FALSE}
+kable(P_transposto)
+```
+
+```{r}
+P_inversa = solve(P)
+```
+
+```{r echo=FALSE}
+kable(P_inversa)
+```
+
+\newpage
+
+### Single Value Decomposition (SVD)
+
+O SVD assim como a decomposição espectral busca representar uma matriz A pelo produto de 3 matrizes da seguinte forma:
+
+$$
+A_{m \times n} = U_{m \times n} \Sigma_{n \times n} V^{T}_{n \times n}
+$$
+
+Onde U e V sao matrizes ortogonais e $\Sigma$ (ou D ou S) é uma matriz diagonal.O cálculo da SVD consiste em encontrar os autovalores e autovetores de $AA^T$ e $A^TA$. Os autovetores de $A^TA$ compõem as colunas de V, os autovetores de $AA^T$ compõem as colunas de U. Além disso, os valores singulares em S (Matriz de valores singulares) são raízes quadradas dos autovalores de $AA^T$ ou $A^TA$. Os valores singulares são as entradas diagonais da matriz S e estão dispostos em ordem decrescente. Os valores singulares são sempre números reais. Se a matriz A for uma matriz real, então U e V também são reais. Resumindo:
+
+$$
+U = AA^T
+$$
+
+$$
+V = A^TA
+$$
+$$
+S = \text{Raiz quadrada dos autovalores de U ou V} 
+$$
+Vale notar que ao aplicar essas transformações nós estamos rotacionando os dados (ortonormalidade) com U, escalando os vetores com S e rotacionando novamente (voltando ao estado inicial) com $V^T$.
+
+```{r}
+sv_decomp = svd(A)
+```
+
+
+```{r echo=FALSE}
+sv_decomp
+```
+
+Podemos verificar o SVD tentando recuparar a matriz A
+```{r}
+sv_decomp$u %*% diag(sv_decomp$d) %*% t(sv_decomp$v)
+```
+
+```{r}
+#verificar
+sv_decomp$u %o% diag(sv_decomp$d) %o% t(sv_decomp$v)
+```
+
+
+### Diferenças entre a Decomposição espectral e o SVD
+
+Considere a decomposição em autovalores $A=PDP^{-1}$ e a SVD $A=U \Sigma V^{-1}$. Algumas diferenças-chave são as seguintes:
+
+* Os vetores na matriz de decomposição em autovalores P não são necessariamente ortogonais, então a mudança de base não é uma simples rotação. Por outro lado, os vetores nas matrizes U e V na SVD são ortonormais, então eles representam rotações (e possivelmente reflexões). 
+
+* Na SVD, as matrizes não diagonais U e V não são necessariamente inversas uma da outra. Geralmente, elas não têm relação entre si. Na decomposição em autovalores, as matrizes não diagonais P e $P^{-1}$ são inversas uma da outra.
+
+* Na SVD, as entradas na matriz diagonal $\Sigma$ são todas números reais e não negativos. Na decomposição em autovalores, as entradas de D podem ser qualquer número complexo - negativo, positivo, imaginário, qualquer coisa.
+
+* A SVD sempre existe para qualquer tipo de matriz retangular ou quadrada, enquanto a decomposição em autovalores só existe para matrizes quadradas e, mesmo entre as matrizes quadradas, às vezes ela não existe.
+
+
+### Analise de componentens principais (PCA)
+
+Aplicar o SVD em uma matriz de Covariancia ou Correlação podemos retirar informacoes importantes sobre um conjunto de dados.
+
+Mas antes vamos entender o que ocorre com os dados ao obter essas matrizes.
+
+* A matriz de covariancia ela mantem a escala dos dados e não é centralizada.
+
+* A matriz de correlaçao ela normaliza os dados (divide pela variancia) ou seja ela controla a escala das variaveis deixando todas "iguais" 
+
+* A centralização dos dados pode ser feita, que nada mais é que subtrair a media de cada coluna, centralizando os dados em torno de 0.
+
+
+
+
+
