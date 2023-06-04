@@ -114,6 +114,7 @@ solve(yy)  # Erro
 
 (Pres <- P - r%*%t(c)) # residuos
 
+#obtendo a distancia de qui quadrado pela inercia
 (R0 <- (sqrt(solve(Dc))%*%t(Pres)%*%solve(Dr)
         %*%Pres%*%sqrt(solve(Dc))))
 
@@ -121,8 +122,12 @@ solve(yy)  # Erro
 (inercia * n)
 qs
 
+
+#os autovlaroes da matriz R0 podem nos dizer quais inercias mais contribuem para a inercia total
 eR0 <- eigen(R0)
-cumsum(eR0$values/inercia)
+round(eR0$values/inercia,4) #quanto cada inercia contribui
+
+cumsum(eR0$values/inercia) #inercia acumulada
 
 #### Coordenadas Principais ####
 

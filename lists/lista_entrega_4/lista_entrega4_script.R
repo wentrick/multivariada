@@ -1,8 +1,4 @@
 pacman::p_load(tidyverse,vcd,FactoMineR,factoextra,ca)
-library(tidyverse)
-library(FactoMineR)
-library(factoextra)
-library(vcd)
 data("Suicide")
 
 
@@ -41,7 +37,7 @@ cbind(round(perfil_coluna,2),média = round(rowSums(tabela_contingencia)/sum(tab
 
 (chi2 <- sum((tabela_contingencia-valor_esperado)^2/valor_esperado))
 (gl <- (nrow(tabela_contingencia)-1)*(ncol(tabela_contingencia)-1))
-(pchi2 <- 1- pchisq(chi2,gl))
+(pchi2 <- 1 - pchisq(chi2,gl))
 
 (n <- sum(tabela_contingencia))
 
