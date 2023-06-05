@@ -1,0 +1,521 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Decomposição Espectral, SVD e PCA},
+  pdfauthor={Davi Wentrick Feijó - 200016806},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Decomposição Espectral, SVD e PCA}
+\author{Davi Wentrick Feijó - 200016806}
+\date{2023-05-23}
+
+\begin{document}
+\maketitle
+
+\hypertarget{decomposiuxe7uxe3o-espectral}{%
+\subsubsection{Decomposição
+Espectral}\label{decomposiuxe7uxe3o-espectral}}
+
+A decomposição espectral consiste em decompor uma matriz A no produto de
+3 matrizes da seguinte forma:
+
+\[
+A_{n \times n} = P_{n \times n} D_{n \times n} P_{n \times n}^{T}
+\]
+
+Onde P é uma matriz onde as cada coluna é composta por um autovetor de A
+e D e uma matriz diagonal com os autovalores correspondentes a cada
+autovetor de A.
+
+Podemos realizar isso dentro do R por meio da função eigen(). Vamos
+utilizar a seguinte matriz e usaremos a matriz de covariancia dela (com
+isso garantimos que ela é positiva definida)
+
+\begin{verbatim}
+##           [,1]      [,2]     [,3]      [,4]
+## [1,]  99.00000  61.33333 20.50000 -29.66667
+## [2,]  61.33333  40.33333 20.16667 -12.00000
+## [3,]  20.50000  20.16667 30.25000  24.16667
+## [4,] -29.66667 -12.00000 24.16667  72.33333
+\end{verbatim}
+
+Aqui vamos fazer nossa decomposicao, o resultado saira como um objeto
+onde \$vectors é nosso P e \$values é a matriz D (temos que usar a
+função diag() para que tenhamos a matriz diagona pois o resultado sai em
+um vetor)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{spectral\_decomposition }\OtherTok{=} \FunctionTok{eigen}\NormalTok{(A)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P }\OtherTok{=}\NormalTok{ spectral\_decomposition}\SpecialCharTok{$}\NormalTok{vectors}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]      [,2]       [,3]        [,4]
+## [1,] -0.7943006 0.1158358  0.4105382  0.43258175
+## [2,] -0.4936169 0.1906772 -0.1244255 -0.83934669
+## [3,] -0.1506798 0.5193732 -0.7771652  0.32180960
+## [4,]  0.3205066 0.8249096  0.4604248 -0.06934517
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{D }\OtherTok{=} \FunctionTok{diag}\NormalTok{(spectral\_decomposition}\SpecialCharTok{$}\NormalTok{values)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          [,1]     [,2]     [,3]          [,4]
+## [1,] 152.9751  0.00000 0.000000  0.000000e+00
+## [2,]   0.0000 80.60931 0.000000  0.000000e+00
+## [3,]   0.0000  0.00000 8.332241  0.000000e+00
+## [4,]   0.0000  0.00000 0.000000 -1.030665e-14
+\end{verbatim}
+
+Podemos confimar a decomposição tentando obter a matriz A novamente
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A\_recuperado }\OtherTok{=}\NormalTok{ P }\SpecialCharTok{\%*\%}\NormalTok{ D }\SpecialCharTok{\%*\%} \FunctionTok{solve}\NormalTok{(P)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]      [,2]     [,3]      [,4]
+## [1,]  99.00000  61.33333 20.50000 -29.66667
+## [2,]  61.33333  40.33333 20.16667 -12.00000
+## [3,]  20.50000  20.16667 30.25000  24.16667
+## [4,] -29.66667 -12.00000 24.16667  72.33333
+\end{verbatim}
+
+Vale notar que quando A é simetrica \(P^{-1} = P^{T}\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P\_transposto }\OtherTok{=} \FunctionTok{t}\NormalTok{(P)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.7943006 -0.4936169 -0.1506798  0.32050662
+## [2,]  0.1158358  0.1906772  0.5193732  0.82490957
+## [3,]  0.4105382 -0.1244255 -0.7771652  0.46042476
+## [4,]  0.4325818 -0.8393467  0.3218096 -0.06934517
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{P\_inversa }\OtherTok{=} \FunctionTok{solve}\NormalTok{(P)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.7943006 -0.4936169 -0.1506798  0.32050662
+## [2,]  0.1158358  0.1906772  0.5193732  0.82490957
+## [3,]  0.4105382 -0.1244255 -0.7771652  0.46042476
+## [4,]  0.4325818 -0.8393467  0.3218096 -0.06934517
+\end{verbatim}
+
+\newpage
+
+\hypertarget{single-value-decomposition-svd}{%
+\subsubsection{Single Value Decomposition
+(SVD)}\label{single-value-decomposition-svd}}
+
+O SVD assim como a decomposição espectral busca representar uma matriz A
+pelo produto de 3 matrizes da seguinte forma:
+
+\[
+A_{m \times n} = U_{m \times n} \Sigma_{n \times n} V^{T}_{n \times n}
+\]
+
+Onde U e V sao matrizes ortogonais e \(\Sigma\) (ou D ou S) é uma matriz
+diagonal.O cálculo da SVD consiste em encontrar os autovalores e
+autovetores de \(AA^T\) e \(A^TA\). Os autovetores de \(A^TA\) compõem
+as colunas de V, os autovetores de \(AA^T\) compõem as colunas de U.
+Além disso, os valores singulares em S (Matriz de valores singulares)
+são raízes quadradas dos autovalores de \(AA^T\) ou \(A^TA\). Os valores
+singulares são as entradas diagonais da matriz S e estão dispostos em
+ordem decrescente. Os valores singulares são sempre números reais. Se a
+matriz A for uma matriz real, então U e V também são reais. Resumindo:
+
+\[
+U = AA^T
+\]
+
+\[
+V = A^TA
+\] \[
+S = \text{Raiz quadrada dos autovalores de U ou V} 
+\] Vale notar que ao aplicar essas transformações nós estamos
+rotacionando os dados (ortonormalidade) com U, escalando os vetores com
+S e rotacionando novamente (voltando ao estado inicial) com \(V^T\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sv\_decomp }\OtherTok{=} \FunctionTok{svd}\NormalTok{(A)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $d
+## [1] 1.529751e+02 8.060931e+01 8.332241e+00 1.091777e-14
+## 
+## $u
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.7943006 -0.1158358  0.4105382  0.43258175
+## [2,] -0.4936169 -0.1906772 -0.1244255 -0.83934669
+## [3,] -0.1506798 -0.5193732 -0.7771652  0.32180960
+## [4,]  0.3205066 -0.8249096  0.4604248 -0.06934517
+## 
+## $v
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.7943006 -0.1158358  0.4105382 -0.43258175
+## [2,] -0.4936169 -0.1906772 -0.1244255  0.83934669
+## [3,] -0.1506798 -0.5193732 -0.7771652 -0.32180960
+## [4,]  0.3205066 -0.8249096  0.4604248  0.06934517
+\end{verbatim}
+
+Podemos verificar o SVD tentando recuparar a matriz A
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sv\_decomp}\SpecialCharTok{$}\NormalTok{u }\SpecialCharTok{\%*\%} \FunctionTok{diag}\NormalTok{(sv\_decomp}\SpecialCharTok{$}\NormalTok{d) }\SpecialCharTok{\%*\%} \FunctionTok{t}\NormalTok{(sv\_decomp}\SpecialCharTok{$}\NormalTok{v)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]      [,2]     [,3]      [,4]
+## [1,]  99.00000  61.33333 20.50000 -29.66667
+## [2,]  61.33333  40.33333 20.16667 -12.00000
+## [3,]  20.50000  20.16667 30.25000  24.16667
+## [4,] -29.66667 -12.00000 24.16667  72.33333
+\end{verbatim}
+
+\hypertarget{diferenuxe7as-entre-a-decomposiuxe7uxe3o-espectral-e-o-svd}{%
+\subsubsection{Diferenças entre a Decomposição espectral e o
+SVD}\label{diferenuxe7as-entre-a-decomposiuxe7uxe3o-espectral-e-o-svd}}
+
+Considere a decomposição em autovalores \(A=PDP^{-1}\) e a SVD
+\(A=U \Sigma V^{-1}\). Algumas diferenças-chave são as seguintes:
+
+\begin{itemize}
+\item
+  Os vetores na matriz de decomposição em autovalores P não são
+  necessariamente ortogonais, então a mudança de base não é uma simples
+  rotação. Por outro lado, os vetores nas matrizes U e V na SVD são
+  ortonormais, então eles representam rotações (e possivelmente
+  reflexões).
+\item
+  Na SVD, as matrizes não diagonais U e V não são necessariamente
+  inversas uma da outra. Geralmente, elas não têm relação entre si. Na
+  decomposição em autovalores, as matrizes não diagonais P e \(P^{-1}\)
+  são inversas uma da outra.
+\item
+  Na SVD, as entradas na matriz diagonal \(\Sigma\) são todas números
+  reais e não negativos. Na decomposição em autovalores, as entradas de
+  D podem ser qualquer número complexo - negativo, positivo, imaginário,
+  qualquer coisa.
+\item
+  A SVD sempre existe para qualquer tipo de matriz retangular ou
+  quadrada, enquanto a decomposição em autovalores só existe para
+  matrizes quadradas e, mesmo entre as matrizes quadradas, às vezes ela
+  não existe.
+\end{itemize}
+
+\hypertarget{analise-de-componentens-principais-pca}{%
+\subsubsection{Analise de componentens principais
+(PCA)}\label{analise-de-componentens-principais-pca}}
+
+Aplicar o SVD em uma matriz de Covariancia ou Correlação podemos retirar
+informacoes importantes sobre um conjunto de dados.
+
+Mas antes vamos entender o que ocorre com os dados ao obter essas
+matrizes.
+
+\begin{itemize}
+\item
+  A matriz de covariancia ela mantem a escala dos dados e não é
+  centralizada.
+\item
+  A matriz de correlaçao ela normaliza os dados (divide pela variancia)
+  ou seja ela controla a escala das variaveis deixando todas ``iguais''
+\item
+  A centralização dos dados pode ser feita, que nada mais é que subtrair
+  a media de cada coluna, centralizando os dados em torno de 0 é
+  recomendado ser feita.
+\end{itemize}
+
+A PCA pode ser feita tanto por Decomposição espectral ou SVD. A
+diferenca é que o SVD funciona em matrizes nao quadradas como vimos
+antes. Podemos comparar os resultados obtidos manualmente com as funcoes
+ja implementadas.
+
+Podemos mostrar que a matriz de covariancia A centralizada é:
+
+\[
+A_{n \times n} = \frac{X_{n \times m}  X_{n \times m}^{T}}{n-1}
+\] Podemos aplicar a decomposicao espectral em X e susbtituir na formula
+\[
+X_{m \times n} = U_{m \times n} \Sigma_{n \times n} V^{T}_{n \times n}
+\] \[
+A_{n \times n} = \frac{V \Sigma U^{T} U \Sigma V^{T}}{n-1}
+\] \[
+A_{n \times n} = V\frac{\Sigma^2 }{n-1}V^{T}
+\] Com isso sabemos a relacao entre os valores singulares (diagonal do
+SVD) e os autovalores (Decomposicao espectral)
+
+\[
+\lambda = \frac{\Sigma^2 }{n-1}
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A }\OtherTok{=} \FunctionTok{scale}\NormalTok{(A,}\AttributeTok{center =}\NormalTok{ T)}
+\NormalTok{n }\OtherTok{=} \FunctionTok{dim}\NormalTok{(A)[}\DecValTok{1}\NormalTok{]}
+\CommentTok{\# Executando a PCA com prcomp()}
+\NormalTok{resultado\_prcomp }\OtherTok{\textless{}{-}} \FunctionTok{prcomp}\NormalTok{(A)}
+
+\CommentTok{\# Executando a decomposição SVD com svd()}
+\NormalTok{resultado\_svd }\OtherTok{\textless{}{-}} \FunctionTok{svd}\NormalTok{(A)}
+
+\CommentTok{\# Executando a decomposição espectral com eigen()}
+\NormalTok{resultado\_eigen }\OtherTok{\textless{}{-}} \FunctionTok{eigen}\NormalTok{(A)}
+
+\CommentTok{\# Obtendo os componentes principais e autovalores usando prcomp()}
+\NormalTok{autovetores\_prcomp }\OtherTok{\textless{}{-}}\NormalTok{ resultado\_prcomp}\SpecialCharTok{$}\NormalTok{rotation}
+\NormalTok{autovalores\_prcomp }\OtherTok{\textless{}{-}}\NormalTok{ resultado\_prcomp}\SpecialCharTok{$}\NormalTok{sdev}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{componentes\_principais\_prcomp }\OtherTok{=}\NormalTok{ resultado\_prcomp}\SpecialCharTok{$}\NormalTok{x}
+
+\CommentTok{\# Obtendo os componentes principais e autovalores usando a decomposição SVD manual}
+\NormalTok{autovetores\_svd }\OtherTok{\textless{}{-}}\NormalTok{ resultado\_svd}\SpecialCharTok{$}\NormalTok{v}
+\NormalTok{autovalores\_svd }\OtherTok{\textless{}{-}}\NormalTok{ (resultado\_svd}\SpecialCharTok{$}\NormalTok{d}\SpecialCharTok{\^{}}\DecValTok{2}\SpecialCharTok{/}\NormalTok{(n}\DecValTok{{-}1}\NormalTok{))}
+\NormalTok{componentes\_principais\_svd }\OtherTok{=}\NormalTok{ A }\SpecialCharTok{\%*\%}\NormalTok{ resultado\_svd}\SpecialCharTok{$}\NormalTok{v}
+
+\CommentTok{\# Obtendo os componentes principais e autovalores usando a decomposição SVD manual}
+\NormalTok{autovetores\_eigen }\OtherTok{\textless{}{-}}\NormalTok{ resultado\_eigen}\SpecialCharTok{$}\NormalTok{vectors}
+\NormalTok{autovalores\_eigen }\OtherTok{\textless{}{-}}\NormalTok{ resultado\_eigen}\SpecialCharTok{$}\NormalTok{values}
+\NormalTok{componentes\_principais\_eigen }\OtherTok{=}\NormalTok{ A }\SpecialCharTok{\%*\%}\NormalTok{ resultado\_eigen}\SpecialCharTok{$}\NormalTok{vectors}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Autovetores (Rotacao):"
+\end{verbatim}
+
+\begin{verbatim}
+## Prcomp:
+\end{verbatim}
+
+\begin{verbatim}
+##             PC1        PC2        PC3         PC4
+## [1,] -0.5415312  0.1716512 0.47709478  0.67056717
+## [2,] -0.5371016  0.2358534 0.33916720 -0.73543227
+## [3,]  0.3601088  0.9318450 0.01401336  0.04231065
+## [4,]  0.5372033 -0.2158100 0.81064777 -0.08768606
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "SVD Manual:"
+\end{verbatim}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.5415312  0.1716512 0.47709478  0.67056717
+## [2,] -0.5371016  0.2358534 0.33916720 -0.73543227
+## [3,]  0.3601088  0.9318450 0.01401336  0.04231065
+## [4,]  0.5372033 -0.2158100 0.81064777 -0.08768606
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "Eigen:"
+\end{verbatim}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]        [,4]
+## [1,] -0.5415312  0.1716512 0.47709478  0.67056717
+## [2,] -0.5371016  0.2358534 0.33916720 -0.73543227
+## [3,]  0.3601088  0.9318450 0.01401336  0.04231065
+## [4,]  0.5372033 -0.2158100 0.81064777 -0.08768606
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "Autovalores:"
+\end{verbatim}
+
+\begin{verbatim}
+## Prcomp: 3.336 0.653 0.01 0
+\end{verbatim}
+
+\begin{verbatim}
+## SVD Manual: 3.336 0.653 0.01 0
+\end{verbatim}
+
+\begin{verbatim}
+## Eigen: 3.037 1.156 0.012 0
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "Componentes Principais (Rotacao):"
+\end{verbatim}
+
+\begin{verbatim}
+## Prcomp:
+\end{verbatim}
+
+\begin{verbatim}
+##             PC1          PC2         PC3           PC4
+## [1,] -1.9516975  0.003282231  0.10652345 -9.714451e-17
+## [2,] -1.0359992 -0.423394122 -0.13012990  1.249001e-16
+## [3,]  0.9178242  1.129994474 -0.02102752  6.938894e-18
+## [4,]  2.0698724 -0.709882584  0.04463398  1.110223e-16
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "SVD Manual:"
+\end{verbatim}
+
+\begin{verbatim}
+##            [,1]         [,2]        [,3]          [,4]
+## [1,] -1.9516975  0.003282231  0.10652345 -3.469447e-16
+## [2,] -1.0359992 -0.423394122 -0.13012990 -1.179612e-16
+## [3,]  0.9178242  1.129994474 -0.02102752  1.700029e-16
+## [4,]  2.0698724 -0.709882584  0.04463398  3.469447e-16
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "Eigen:"
+\end{verbatim}
+
+\begin{verbatim}
+##            [,1]         [,2]        [,3]          [,4]
+## [1,] -1.9516975  0.003282231  0.10652345 -3.469447e-16
+## [2,] -1.0359992 -0.423394122 -0.13012990 -1.179612e-16
+## [3,]  0.9178242  1.129994474 -0.02102752  1.700029e-16
+## [4,]  2.0698724 -0.709882584  0.04463398  3.469447e-16
+\end{verbatim}
+
+\end{document}

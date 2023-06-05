@@ -1,13 +1,15 @@
-  ---
+---
 title: "Decomposição Espectral, SVD e PCA"
 author: "Davi Wentrick Feijó - 200016806"
 date: "2023-05-23"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,knitr)
+pacman::p_load(tidyverse,knitr,kableExtra)
 set.seed(420)
 ```
 
@@ -27,7 +29,7 @@ Podemos realizar isso dentro do R por meio da função eigen(). Vamos utilizar a
 ```{r echo=FALSE}
 dados <- matrix(round(runif(16,min = 0,max = 30), 0),nrow = 4)
 A = cov(dados)
-kable(A)
+A
 ```
 
 Aqui vamos fazer nossa decomposicao, o resultado saira como um objeto onde \$vectors é nosso P e \$values é a matriz D (temos que usar a função diag() para que tenhamos a matriz diagona pois o resultado sai em um vetor)
@@ -40,7 +42,7 @@ P = spectral_decomposition$vectors
 ```
 
 ```{r echo=FALSE}
-kable(P)
+P
 ```
 
 ```{r}
@@ -48,7 +50,7 @@ D = diag(spectral_decomposition$values)
 ```
 
 ```{r echo=FALSE}
-kable(D)
+D
 ```
 
 Podemos confimar a decomposição tentando obter a matriz A novamente
@@ -58,7 +60,7 @@ A_recuperado = P %*% D %*% solve(P)
 ```
 
 ```{r echo=FALSE}
-kable(A_recuperado)
+A_recuperado
 ```
 
 Vale notar que quando A é simetrica $P^{-1} = P^{T}$
@@ -68,7 +70,7 @@ P_transposto = t(P)
 ```
 
 ```{r echo=FALSE}
-kable(P_transposto)
+P_transposto
 ```
 
 ```{r}
@@ -76,7 +78,7 @@ P_inversa = solve(P)
 ```
 
 ```{r echo=FALSE}
-kable(P_inversa)
+P_inversa
 ```
 
 \newpage
@@ -117,11 +119,6 @@ Podemos verificar o SVD tentando recuparar a matriz A
 sv_decomp$u %*% diag(sv_decomp$d) %*% t(sv_decomp$v)
 ```
 
-```{r}
-#verificar
-sv_decomp$u %o% diag(sv_decomp$d) %o% t(sv_decomp$v)
-```
-
 
 ### Diferenças entre a Decomposição espectral e o SVD
 
@@ -146,7 +143,107 @@ Mas antes vamos entender o que ocorre com os dados ao obter essas matrizes.
 
 * A matriz de correlaçao ela normaliza os dados (divide pela variancia) ou seja ela controla a escala das variaveis deixando todas "iguais" 
 
-* A centralização dos dados pode ser feita, que nada mais é que subtrair a media de cada coluna, centralizando os dados em torno de 0.
+* A centralização dos dados pode ser feita, que nada mais é que subtrair a media de cada coluna, centralizando os dados em torno de 0 é recomendado ser feita.
+
+A PCA pode ser feita tanto por Decomposição espectral ou SVD. A diferenca é que o SVD funciona em matrizes nao quadradas como vimos antes. Podemos comparar os resultados obtidos manualmente com as funcoes ja implementadas.
+
+Podemos mostrar que a matriz de covariancia A centralizada é:
+
+$$
+A_{n \times n} = \frac{X_{n \times m}  X_{n \times m}^{T}}{n-1}
+$$
+Podemos aplicar a decomposicao espectral em X e susbtituir na formula
+$$
+X_{m \times n} = U_{m \times n} \Sigma_{n \times n} V^{T}_{n \times n}
+$$
+$$
+A_{n \times n} = \frac{V \Sigma U^{T} U \Sigma V^{T}}{n-1}
+$$
+$$
+A_{n \times n} = V\frac{\Sigma^2 }{n-1}V^{T}
+$$
+Com isso sabemos a relacao entre os valores singulares (diagonal do SVD) e os autovalores (Decomposicao espectral)
+
+
+$$
+\lambda = \frac{\Sigma^2 }{n-1}
+$$
+
+
+```{r}
+A = scale(A,center = T)
+n = dim(A)[1]
+# Executando a PCA com prcomp()
+resultado_prcomp <- prcomp(A)
+
+# Executando a decomposição SVD com svd()
+resultado_svd <- svd(A)
+
+# Executando a decomposição espectral com eigen()
+resultado_eigen <- eigen(A)
+
+# Obtendo os componentes principais e autovalores usando prcomp()
+autovetores_prcomp <- resultado_prcomp$rotation
+autovalores_prcomp <- resultado_prcomp$sdev^2
+componentes_principais_prcomp = resultado_prcomp$x
+
+# Obtendo os componentes principais e autovalores usando a decomposição SVD manual
+autovetores_svd <- resultado_svd$v
+autovalores_svd <- (resultado_svd$d^2/(n-1))
+componentes_principais_svd = A %*% resultado_svd$v
+
+# Obtendo os componentes principais e autovalores usando a decomposição SVD manual
+autovetores_eigen <- resultado_eigen$vectors
+autovalores_eigen <- resultado_eigen$values
+componentes_principais_eigen = A %*% resultado_eigen$vectors
+```
+
+Vamos comparar os 3 metodos observando os resultados obtidos
+
+Podemos perceber que uma vez que trabalhamos com os dados centralizados todos os metodos obtem os mesmos autovetores (rotacao)
+```{r echo=FALSE}
+
+print("Autovetores (Rotacao):")
+cat("Prcomp:")
+print(autovetores_prcomp)
+print("SVD Manual:")
+print(autovetores_svd)
+print("Eigen:")
+print(autovetores_svd)
+```
+
+Observando os autovalores (nosso escalar que indica a maior variancia) pode ser obtido. Vale notar que o prcomp nos dá o desvio padrao (entao elevamos ao quadrado para obter a variancia), o svd temos a diagonal com os valores singulares, para obter os autovalores é necessario elevar ao quadrado e dividir por N ou n-1 no caso de amostra. 
+```{r echo=FALSE}
+# Comparando os autovalores
+print("Autovalores:")
+cat("Prcomp:",round(autovalores_prcomp,3))
+cat("SVD Manual:",round(autovalores_svd,3))
+cat("Eigen:",round(autovalores_eigen,3))
+```
+
+As componentes principais nada mais é do que a projecao da matriz A de covariancia no plano de maior variancia para isso temos que realizar a seguinte conta:
+
+$$
+PC_k = A \times P_k
+$$
+Onde A é sua matriz original (no nosso caso é a matriz de covariancias A) e P é a matriz de autovetores (rotacao) obtida. Ao relizar essa multiplicacao teremos as $k$ componentes principais
+
+
+```{r echo=FALSE}
+# Comparando os componentes principais
+print("Componentes Principais (Rotacao):")
+cat("Prcomp:")
+print(componentes_principais_prcomp)
+print("SVD Manual:")
+print(componentes_principais_svd)
+print("Eigen:")
+print(componentes_principais_svd)
+```
+
+
+
+
+
 
 
 
