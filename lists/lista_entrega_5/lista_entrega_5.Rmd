@@ -75,6 +75,7 @@ p_construido = LLT + psi
 kable(p_construido)
 ```
 
+
 ### Questao 2 (9.2)
 
 #### A)
@@ -137,6 +138,8 @@ cor_xf = Lestimado[1]/(1*comu[1])
 cor_xf
 ```
 
+
+\newpage
 ### Questao 3 (9.3)
 
 #### A)
@@ -231,7 +234,7 @@ var_explained
 
 Podemos notar que a primeira componente exxplica 65% da variancia dos dados
 
-
+\newpage
 ### Questao 4 (9.19)
 
 
@@ -249,26 +252,34 @@ kable(cor_data)
 ```
 
 
-
+\newpage
 #### A)
 
-```{r}
+Vamos usar a função principa() para obter a analise fatorial com m=2 e m=3
+```{r echo=FALSE}
 AF2 <- principal(cor_data, nfactors = 2, rotate = 'none',
                    covar = F,n.obs = 50)
 AF3 <- principal(cor_data, nfactors = 3, rotate = 'none',
                  covar = F,n.obs = 50)
 ```
 
+m=2
 ```{r}
 AF2
+```
+Vale notar que a primeira componente explica 72% enquanto que a segunda 13%. Isso indica que adicionar uma 3 variavel nao deve adicionar muita informação
+
+\newpage
+m=3
+```{r}
 AF3
 ```
 
+Como haviamos discutido antes, acabou que a 3 componente adicionou 7%
 
-
-
+\newpage
 #### B)
-```{r}
+```{r echo=FALSE}
 #b)
 AF2_rotated <- principal(cor_data, nfactors = 2, rotate = 'varimax',
                  covar = F,n.obs = 50)
@@ -276,8 +287,20 @@ AF3_rotated <- principal(cor_data, nfactors = 3, rotate = 'varimax',
                  covar = F,n.obs = 50)
 ```
 
-#### C)
+Aqui temos as mesmas analises porem rotacionadas com o metodos "varimax"
 ```{r}
+AF2_rotated
+```
+
+\newpage
+```{r}
+AF3_rotated
+```
+Apos aplicar a rotação podemos perceber que a informação fica mais bem distribuida entre as componentes. O objetivo é simplificar a analise.
+
+\newpage
+#### C)
+```{r echo=FALSE}
 #c)
 
 AF2_comu = AF2$loadings^2
@@ -292,12 +315,43 @@ AF3_LLT = AF3$loadings %*% t(AF3$loadings)
 resAF3 <- round(cor(data) - AF3_LLT - AF3_psi,3)
 ```
 
+Vamos obter as comunalidades, a variancia especifica e a matriz L sem a rotação varimax
+
+```{r echo=FALSE}
+cat("Resultados para m=2")
+cat("A comunalidade é:\n",round(AF2_comu,2))
+cat("A diagonal da matriz psi é:\n",round(AF2$uniquenesses,2))
+cat("A matriz LLT:")
+round(AF2_LLT,3)
+cat("Matriz de correlação aproximada:")
+resAF2
+```
+```{r echo=FALSE}
+cat("Resultados para m=3")
+cat("A comunalidade é:\n",round(AF3_comu,2))
+cat("A diagonal da matriz psi é:\n",round(AF3$uniquenesses,2))
+cat("A matriz LLT:")
+round(AF3_LLT,3)
+cat("Matriz de correlação aproximada:")
+resAF2
+```
+
+
+
+
+
 #### D)
-```{r}
+
+Vamos testar se o numero de fatores é suficiente para representar o banco
+
+- Hipótese nula ($H_0$): $\Sigma = LL^T + \Psi$
+- Hipótese alternativa ($H_1$): $\Sigma \neq LL^T + \Psi$
+
+Podemos usar a propria função principal para fazer o calculo do teste, mas para isso temos que adicionar o numero de observaçoes.
+```{r echo=FALSE}
 #d)
 
 #m=2
-dim(AF2$loadings)
 
 n = dim(data)[1]
 p = dim(AF2$loadings)[1]
@@ -305,21 +359,33 @@ m = dim(AF2$loadings)[2]
 
 AF2_teste_stat = AF2$chi
 AF2_pvalue = AF2$PVAL
+```
 
+```{r echo=FALSE}
+cat("Teste para m=2")
+cat('A estatica qui-quadrado obtida foi:',AF2_teste_stat)
+cat('O p-valor obtido foi:',AF2_pvalue)
+```
+
+
+```{r echo=FALSE}
 #m=3
-dim(AF3$loadings)
 
 n = dim(data)[1]
 p = dim(AF3$loadings)[1]
 m = dim(AF3$loadings)[2]
 
-AF2_teste_stat = AF3$chi
-AF2_pvalue = AF3$PVAL
+AF3_teste_stat = AF3$chi
+AF3_pvalue = AF3$PVAL
+```
+
+```{r echo=FALSE}
+cat("Teste para m=3")
+cat('A estatica qui-quadrado obtida foi:',AF3_teste_stat)
+cat('O p-valor obtido foi:',AF3_pvalue)
 ```
 
 
-
-
-
+A partir do p-valor temos evidencias para rejeitar H0 indicando que 2 e 3 fatores nao sao suficiente para estimar a matriz $\Sigma$ logo teriamos que usar mais fatores para representar melhor.
 
 
