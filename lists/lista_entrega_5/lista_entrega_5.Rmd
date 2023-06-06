@@ -7,24 +7,319 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(psych,readxl,data.table,Matrix,knitr)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+### Questao 1 (9.1)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+A questao nos dá a matriz de covariancia $\rho$ e a matriz de erros $\Psi$
 
-```{r cars}
-summary(cars)
+
+```{r echo=FALSE}
+p = matrix(c(1.0,0.63,0.45,
+             0.63,1.0,0.35,
+             0.45,0.35,1.0),nrow = 3)
+
+psi = matrix(c(0.19,0,0,0,0.51,0,0,0,0.75),ncol = 3)
+```
+A matriz $\rho$
+```{r echo=FALSE}
+kable(p) 
 ```
 
-## Including Plots
+A matriz $\Psi$
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r echo=FALSE}
+kable(psi) 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Sabemos que na analise fatorial temos a seguinte relacao:
+
+$$
+\Sigma = LL^T + \Psi
+$$
+$$
+LL^T = \Sigma - \Psi
+$$
+Calculando $LL^T$
+
+```{r echo=FALSE}
+LLT = p - psi
+```
+
+```{r echo=FALSE}
+kable(LLT) 
+```
+
+Podemos encontrar a comunalidade na diagonal da matriz $LL^T$ já que subtraimos o $\Psi$
+
+```{r echo=FALSE}
+comu = diag(LLT)
+```
+
+```{r echo=FALSE}
+kable(comu)
+```
+
+Com essas informacoes podemos escrever nossa matriz $\Sigma$ como:
+
+$$
+\Sigma = LL^T + \Psi
+$$
+```{r}
+p_construido = LLT + psi
+```
+
+```{r echo=FALSE}
+kable(p_construido)
+```
+
+### Questao 2 (9.2)
+
+#### A)
+
+As comunalidades sao:
+
+```{r}
+comu
+```
+Podemos perceber que F1 detem a maior comunalidade logo é o fator que mais explica a variancia dos dados
+
+#### B)
+Sabemos que:
+$$
+Cor(X,Y) = \frac{Cov(X,Y)}{S_xS_y}
+$$
+$$
+Cov(X,F) = L
+$$
+Logo
+
+$$
+Cor(X_i,F_i) = \frac{Cov(X_i,F_i)}{S_iS_f} = \frac{L_i}{S_xS_f}
+$$
+```{r echo=FALSE}
+eigen_p = eigen(p)
+
+
+autoval <- eigen_p$values
+
+
+
+autovet <- eigen_p$vectors
+
+
+D <- matrix(0, nrow = 3, ncol = 3)
+diag(D) <- sqrt(autoval)
+
+Lestimado <- (autovet%*%D)[,1]
+LTestimado <- t(Lestimado)
+
+LLT <- Lestimado%*%LTestimado
+
+comu <- Lestimado^2
+
+psiestimado <- diag(p-LLT)
+
+ajuste <- p - (LLT+psi)
+
+var_explained = autoval/sum(autoval)
+```
+
+
+
+```{r}
+cor_xf = Lestimado[1]/(1*comu[1])
+```
+
+```{r echo=FALSE}
+cor_xf
+```
+
+### Questao 3 (9.3)
+
+#### A)
+Para realizar por meio de componentes principais primeiro precisamos encontrar os autovalores e autovetores da matriz de correlacao aplicando a decompisicao espectral em $\rho$ dada na questao 9.1
+
+$$
+\rho = CDC^T
+$$
+
+```{r}
+eigen_p = eigen(p)
+
+autoval <- eigen_p$values
+
+autovet <- eigen_p$vectors
+
+D <- matrix(0, nrow = 3, ncol = 3)
+diag(D) <- sqrt(autoval)
+```
+
+
+```{r}
+autoval
+```
+
+```{r}
+autovet
+```
+
+
+Em seguida podemos encontrar nossa matriz L
+
+$$
+L = CD^{1/2}
+$$
+
+```{r echo=FALSE}
+Lestimado <- (autovet%*%D)[,1]
+
+LTestimado <- t(Lestimado)
+
+LLT <- Lestimado%*%LTestimado
+```
+
+Aqui temos nossa matriz dos loadings
+```{r}
+Lestimado
+```
+
+Para calcular a matriz $\Psi$ temos que seguir a equacao:
+
+$$
+ \Psi = \Sigma - LL^T
+$$
+Na diagonal obteremos nosso $\Psi$
+
+```{r}
+psiestimado <- diag(p-LLT)
+```
+
+
+```{r}
+psiestimado
+```
+
+Para comparar com os resultados anteriores podemos aproximar a matrix $\Sigma$ de correlacoes por meio da formula:
+
+$$
+\Sigma = LL^T + \Psi
+$$
+
+```{r echo=FALSE}
+sigma_aprox <- LLT+psi
+```
+
+```{r echo=FALSE}
+sigma_aprox
+```
+
+#### B)
+
+A variancia explicada é:
+
+
+```{r echo=FALSE}
+var_explained = autoval/sum(autoval)
+```
+
+```{r echo=FALSE}
+var_explained
+```
+
+Podemos notar que a primeira componente exxplica 65% da variancia dos dados
+
+
+### Questao 4 (9.19)
+
+
+```{r include=FALSE}
+names = c("x1","x2","x3","x4","x5","x6","x7")
+data <- read_excel("table9_12-SalespeopleData.xlsx", 
+                                        col_names = names, col_types = c("numeric", 
+                                                                         "numeric", "numeric", "numeric", 
+                                                                         "numeric", "numeric", "numeric"))
+cor_data = cor(as.matrix(data))
+```
+
+```{r echo=FALSE}
+kable(cor_data)
+```
+
+
+
+#### A)
+
+```{r}
+AF2 <- principal(cor_data, nfactors = 2, rotate = 'none',
+                   covar = F,n.obs = 50)
+AF3 <- principal(cor_data, nfactors = 3, rotate = 'none',
+                 covar = F,n.obs = 50)
+```
+
+```{r}
+AF2
+AF3
+```
+
+
+
+
+#### B)
+```{r}
+#b)
+AF2_rotated <- principal(cor_data, nfactors = 2, rotate = 'varimax',
+                 covar = F,n.obs = 50)
+AF3_rotated <- principal(cor_data, nfactors = 3, rotate = 'varimax',
+                 covar = F,n.obs = 50)
+```
+
+#### C)
+```{r}
+#c)
+
+AF2_comu = AF2$loadings^2
+AF2_psi = diag(AF2$uniquenesses)
+AF2_LLT = AF2$loadings %*% t(AF2$loadings)
+resAF2 <- round(cor(data) - AF2_LLT - AF2_psi,3)
+
+
+AF3_comu = AF3$loadings^3
+AF3_psi = diag(AF3$uniquenesses)
+AF3_LLT = AF3$loadings %*% t(AF3$loadings)
+resAF3 <- round(cor(data) - AF3_LLT - AF3_psi,3)
+```
+
+#### D)
+```{r}
+#d)
+
+#m=2
+dim(AF2$loadings)
+
+n = dim(data)[1]
+p = dim(AF2$loadings)[1]
+m = dim(AF2$loadings)[2]
+
+AF2_teste_stat = AF2$chi
+AF2_pvalue = AF2$PVAL
+
+#m=3
+dim(AF3$loadings)
+
+n = dim(data)[1]
+p = dim(AF3$loadings)[1]
+m = dim(AF3$loadings)[2]
+
+AF2_teste_stat = AF3$chi
+AF2_pvalue = AF3$PVAL
+```
+
+
+
+
+
+
+
