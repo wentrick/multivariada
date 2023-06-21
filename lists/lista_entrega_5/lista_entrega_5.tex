@@ -1,0 +1,758 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Lista Entrega 5},
+  pdfauthor={Davi Wentrick Feijó - 200016806},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Lista Entrega 5}
+\author{Davi Wentrick Feijó - 200016806}
+\date{2023-06-05}
+
+\begin{document}
+\maketitle
+
+\hypertarget{questao-1-9.1}{%
+\subsubsection{Questao 1 (9.1)}\label{questao-1-9.1}}
+
+A questao nos dá a matriz de covariancia \(\rho\) e a matriz de erros
+\(\Psi\)
+
+A matriz \(\rho\)
+
+\begin{longtable}[]{@{}rrr@{}}
+\toprule()
+\endhead
+1.00 & 0.63 & 0.45 \\
+0.63 & 1.00 & 0.35 \\
+0.45 & 0.35 & 1.00 \\
+\bottomrule()
+\end{longtable}
+
+A matriz \(\Psi\)
+
+\begin{longtable}[]{@{}rrr@{}}
+\toprule()
+\endhead
+0.19 & 0.00 & 0.00 \\
+0.00 & 0.51 & 0.00 \\
+0.00 & 0.00 & 0.75 \\
+\bottomrule()
+\end{longtable}
+
+Sabemos que na analise fatorial temos a seguinte relacao:
+
+\[
+\Sigma = LL^T + \Psi
+\] \[
+LL^T = \Sigma - \Psi
+\] Calculando \(LL^T\)
+
+\begin{longtable}[]{@{}rrr@{}}
+\toprule()
+\endhead
+0.81 & 0.63 & 0.45 \\
+0.63 & 0.49 & 0.35 \\
+0.45 & 0.35 & 0.25 \\
+\bottomrule()
+\end{longtable}
+
+Podemos encontrar a comunalidade na diagonal da matriz \(LL^T\) já que
+subtraimos o \(\Psi\)
+
+\begin{longtable}[]{@{}r@{}}
+\toprule()
+x \\
+\midrule()
+\endhead
+0.81 \\
+0.49 \\
+0.25 \\
+\bottomrule()
+\end{longtable}
+
+Com essas informacoes podemos escrever nossa matriz \(\Sigma\) como:
+
+\[
+\Sigma = LL^T + \Psi
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p\_construido }\OtherTok{=}\NormalTok{ LLT }\SpecialCharTok{+}\NormalTok{ psi}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}rrr@{}}
+\toprule()
+\endhead
+1.00 & 0.63 & 0.45 \\
+0.63 & 1.00 & 0.35 \\
+0.45 & 0.35 & 1.00 \\
+\bottomrule()
+\end{longtable}
+
+\hypertarget{questao-2-9.2}{%
+\subsubsection{Questao 2 (9.2)}\label{questao-2-9.2}}
+
+\hypertarget{a}{%
+\paragraph{A)}\label{a}}
+
+As comunalidades sao:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{comu}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.81 0.49 0.25
+\end{verbatim}
+
+Podemos perceber que F1 detem a maior comunalidade logo é o fator que
+mais explica a variancia dos dados
+
+\hypertarget{b}{%
+\paragraph{B)}\label{b}}
+
+Sabemos que: \[
+Cor(X,Y) = \frac{Cov(X,Y)}{S_xS_y}
+\] \[
+Cov(X,F) = L
+\] Logo
+
+\[
+Cor(X_i,F_i) = \frac{Cov(X_i,F_i)}{S_iS_f} = \frac{L_i}{S_xS_f}
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cor\_xf }\OtherTok{=}\NormalTok{ Lestimado[}\DecValTok{1}\NormalTok{]}\SpecialCharTok{/}\NormalTok{(}\DecValTok{1}\SpecialCharTok{*}\NormalTok{comu[}\DecValTok{1}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -1.141896
+\end{verbatim}
+
+\newpage
+
+\hypertarget{questao-3-9.3}{%
+\subsubsection{Questao 3 (9.3)}\label{questao-3-9.3}}
+
+\hypertarget{a-1}{%
+\paragraph{A)}\label{a-1}}
+
+Para realizar por meio de componentes principais primeiro precisamos
+encontrar os autovalores e autovetores da matriz de correlacao aplicando
+a decompisicao espectral em \(\rho\) dada na questao 9.1
+
+\[
+\rho = CDC^T
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{eigen\_p }\OtherTok{=} \FunctionTok{eigen}\NormalTok{(p)}
+
+\NormalTok{autoval }\OtherTok{\textless{}{-}}\NormalTok{ eigen\_p}\SpecialCharTok{$}\NormalTok{values}
+
+\NormalTok{autovet }\OtherTok{\textless{}{-}}\NormalTok{ eigen\_p}\SpecialCharTok{$}\NormalTok{vectors}
+
+\NormalTok{D }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, }\AttributeTok{nrow =} \DecValTok{3}\NormalTok{, }\AttributeTok{ncol =} \DecValTok{3}\NormalTok{)}
+\FunctionTok{diag}\NormalTok{(D) }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(autoval)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{autoval}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.9632830 0.6794930 0.3572239
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{autovet}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            [,1]       [,2]       [,3]
+## [1,] -0.6250027  0.2186276  0.7493822
+## [2,] -0.5931510  0.4910833 -0.6379726
+## [3,] -0.5074875 -0.8432314 -0.1772492
+\end{verbatim}
+
+Em seguida podemos encontrar nossa matriz L
+
+\[
+L = CD^{1/2}
+\]
+
+Aqui temos nossa matriz dos loadings
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Lestimado}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.8757363 -0.8311066 -0.7110772
+\end{verbatim}
+
+Para calcular a matriz \(\Psi\) temos que seguir a equacao:
+
+\[
+ \Psi = \Sigma - LL^T
+\] Na diagonal obteremos nosso \(\Psi\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{psiestimado }\OtherTok{\textless{}{-}} \FunctionTok{diag}\NormalTok{(p}\SpecialCharTok{{-}}\NormalTok{LLT)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{psiestimado}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2330860 0.3092618 0.4943692
+\end{verbatim}
+
+Para comparar com os resultados anteriores podemos aproximar a matrix
+\(\Sigma\) de correlacoes por meio da formula:
+
+\[
+\Sigma = LL^T + \Psi
+\]
+
+\begin{verbatim}
+##           [,1]      [,2]      [,3]
+## [1,] 0.9569140 0.7278302 0.6227161
+## [2,] 0.7278302 1.2007382 0.5909810
+## [3,] 0.6227161 0.5909810 1.2556308
+\end{verbatim}
+
+\hypertarget{b-1}{%
+\paragraph{B)}\label{b-1}}
+
+A variancia explicada é:
+
+\begin{verbatim}
+## [1] 0.6544277 0.2264977 0.1190746
+\end{verbatim}
+
+Podemos notar que a primeira componente exxplica 65\% da variancia dos
+dados
+
+\newpage
+
+\hypertarget{questao-4-9.19}{%
+\subsubsection{Questao 4 (9.19)}\label{questao-4-9.19}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.0411}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1370}}@{}}
+\toprule()
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x5
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x6
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+x7
+\end{minipage} \\
+\midrule()
+\endhead
+x1 & 1.0000000 & 0.9260758 & 0.8840023 & 0.5720363 & 0.7080738 &
+0.6744073 & 0.9273116 \\
+x2 & 0.9260758 & 1.0000000 & 0.8425232 & 0.5415080 & 0.7459097 &
+0.4653880 & 0.9442960 \\
+x3 & 0.8840023 & 0.8425232 & 1.0000000 & 0.7003630 & 0.6374712 &
+0.6410886 & 0.8525682 \\
+x4 & 0.5720363 & 0.5415080 & 0.7003630 & 1.0000000 & 0.5907360 &
+0.1469074 & 0.4126395 \\
+x5 & 0.7080738 & 0.7459097 & 0.6374712 & 0.5907360 & 1.0000000 &
+0.3859502 & 0.5745533 \\
+x6 & 0.6744073 & 0.4653880 & 0.6410886 & 0.1469074 & 0.3859502 &
+1.0000000 & 0.5663721 \\
+x7 & 0.9273116 & 0.9442960 & 0.8525682 & 0.4126395 & 0.5745533 &
+0.5663721 & 1.0000000 \\
+\bottomrule()
+\end{longtable}
+
+\newpage
+
+\hypertarget{a-2}{%
+\paragraph{A)}\label{a-2}}
+
+Vamos usar a função principa() para obter a analise fatorial com m=2 e
+m=3
+
+m=2
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AF2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Principal Components Analysis
+## Call: principal(r = cor_data, nfactors = 2, rotate = "none", n.obs = 50, 
+##     covar = F)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##     PC1   PC2   h2    u2 com
+## x1 0.97 -0.11 0.96 0.041 1.0
+## x2 0.94  0.03 0.89 0.110 1.0
+## x3 0.94  0.01 0.89 0.107 1.0
+## x4 0.66  0.65 0.85 0.147 2.0
+## x5 0.78  0.28 0.69 0.305 1.3
+## x6 0.65 -0.62 0.81 0.194 2.0
+## x7 0.91 -0.19 0.87 0.127 1.1
+## 
+##                        PC1  PC2
+## SS loadings           5.03 0.93
+## Proportion Var        0.72 0.13
+## Cumulative Var        0.72 0.85
+## Proportion Explained  0.84 0.16
+## Cumulative Proportion 0.84 1.00
+## 
+## Mean item complexity =  1.3
+## Test of the hypothesis that 2 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.08 
+##  with the empirical chi square  11.93  with prob <  0.15 
+## 
+## Fit based upon off diagonal values = 0.99
+\end{verbatim}
+
+\newpage
+
+m=3
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AF3}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Principal Components Analysis
+## Call: principal(r = cor_data, nfactors = 3, rotate = "none", n.obs = 50, 
+##     covar = F)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##     PC1   PC2   PC3   h2    u2 com
+## x1 0.97 -0.11 -0.05 0.96 0.039 1.0
+## x2 0.94  0.03 -0.31 0.99 0.013 1.2
+## x3 0.94  0.01  0.14 0.91 0.087 1.0
+## x4 0.66  0.65  0.32 0.95 0.045 2.4
+## x5 0.78  0.28  0.00 0.69 0.305 1.3
+## x6 0.65 -0.62  0.43 0.99 0.012 2.7
+## x7 0.91 -0.19 -0.31 0.97 0.033 1.3
+## 
+##                        PC1  PC2  PC3
+## SS loadings           5.03 0.93 0.50
+## Proportion Var        0.72 0.13 0.07
+## Cumulative Var        0.72 0.85 0.92
+## Proportion Explained  0.78 0.14 0.08
+## Cumulative Proportion 0.78 0.92 1.00
+## 
+## Mean item complexity =  1.6
+## Test of the hypothesis that 3 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.04 
+##  with the empirical chi square  3.95  with prob <  0.27 
+## 
+## Fit based upon off diagonal values = 1
+\end{verbatim}
+
+\newpage
+
+\hypertarget{b-2}{%
+\paragraph{B)}\label{b-2}}
+
+Aqui temos as mesmas analises porem rotacionadas com o metodos
+``varimax''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AF2\_rotated}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Principal Components Analysis
+## Call: principal(r = cor_data, nfactors = 2, rotate = "varimax", n.obs = 50, 
+##     covar = F)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##     RC1   RC2   h2    u2 com
+## x1 0.79  0.58 0.96 0.041 1.8
+## x2 0.67  0.66 0.89 0.110 2.0
+## x3 0.68  0.65 0.89 0.107 2.0
+## x4 0.04  0.92 0.85 0.147 1.0
+## x5 0.38  0.74 0.69 0.305 1.5
+## x6 0.90 -0.01 0.81 0.194 1.0
+## x7 0.80  0.48 0.87 0.127 1.6
+## 
+##                        RC1  RC2
+## SS loadings           3.13 2.84
+## Proportion Var        0.45 0.41
+## Cumulative Var        0.45 0.85
+## Proportion Explained  0.52 0.48
+## Cumulative Proportion 0.52 1.00
+## 
+## Mean item complexity =  1.6
+## Test of the hypothesis that 2 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.08 
+##  with the empirical chi square  11.93  with prob <  0.15 
+## 
+## Fit based upon off diagonal values = 0.99
+\end{verbatim}
+
+\newpage
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AF3\_rotated}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Principal Components Analysis
+## Call: principal(r = cor_data, nfactors = 3, rotate = "varimax", n.obs = 50, 
+##     covar = F)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##     RC1  RC2  RC3   h2    u2 com
+## x1 0.78 0.39 0.45 0.96 0.039 2.1
+## x2 0.91 0.36 0.19 0.99 0.013 1.4
+## x3 0.62 0.55 0.48 0.91 0.087 2.9
+## x4 0.21 0.95 0.05 0.95 0.045 1.1
+## x5 0.55 0.61 0.15 0.69 0.305 2.1
+## x6 0.29 0.06 0.95 0.99 0.012 1.2
+## x7 0.91 0.18 0.33 0.97 0.033 1.3
+## 
+##                        RC1  RC2  RC3
+## SS loadings           3.07 1.89 1.51
+## Proportion Var        0.44 0.27 0.22
+## Cumulative Var        0.44 0.71 0.92
+## Proportion Explained  0.48 0.29 0.23
+## Cumulative Proportion 0.48 0.77 1.00
+## 
+## Mean item complexity =  1.7
+## Test of the hypothesis that 3 components are sufficient.
+## 
+## The root mean square of the residuals (RMSR) is  0.04 
+##  with the empirical chi square  3.95  with prob <  0.27 
+## 
+## Fit based upon off diagonal values = 1
+\end{verbatim}
+
+\hypertarget{c}{%
+\paragraph{C)}\label{c}}
+
+Vamos obter as comunalidades, a variancia especifica e a matriz L sem a
+rotação varimax
+
+\begin{verbatim}
+## A comunalidade com m=2 é:
+##  0.95 0.89 0.89 0.44 0.61 0.42 0.84 0.01 0 0 0.42 0.08 0.39 0.04
+\end{verbatim}
+
+\begin{verbatim}
+## A diagonal da matriz psi com m=2 é:
+##  0.04 0.11 0.11 0.15 0.31 0.19 0.13
+\end{verbatim}
+
+\begin{verbatim}
+## A matriz LLT:
+\end{verbatim}
+
+\begin{verbatim}
+##       x1    x2    x3    x4    x5    x6    x7
+## x1 0.959 0.914 0.918 0.573 0.731 0.698 0.910
+## x2 0.914 0.890 0.891 0.641 0.747 0.594 0.856
+## x3 0.918 0.891 0.893 0.630 0.743 0.607 0.862
+## x4 0.573 0.641 0.630 0.853 0.701 0.028 0.479
+## x5 0.731 0.747 0.743 0.701 0.695 0.331 0.661
+## x6 0.698 0.594 0.607 0.028 0.331 0.806 0.713
+## x7 0.910 0.856 0.862 0.479 0.661 0.713 0.873
+\end{verbatim}
+
+\begin{verbatim}
+## Matriz de correlação aproximada:
+\end{verbatim}
+
+\begin{verbatim}
+##        x1     x2     x3     x4     x5     x6     x7
+## x1  0.000  0.012 -0.034 -0.001 -0.023 -0.024  0.017
+## x2  0.012  0.000 -0.049 -0.099 -0.001 -0.129  0.088
+## x3 -0.034 -0.049  0.000  0.071 -0.105  0.034 -0.009
+## x4 -0.001 -0.099  0.071  0.000 -0.111  0.119 -0.066
+## x5 -0.023 -0.001 -0.105 -0.111  0.000  0.055 -0.086
+## x6 -0.024 -0.129  0.034  0.119  0.055  0.000 -0.147
+## x7  0.017  0.088 -0.009 -0.066 -0.086 -0.147  0.000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"A comunalidade com m=2 é:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}\FunctionTok{round}\NormalTok{(AF3\_comu,}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## A comunalidade com m=2 é:
+##  0.92 0.84 0.84 0.29 0.48 0.27 0.76 0 0 0 0.27 0.02 -0.24 -0.01 0 -0.03 0 0.03 0 0.08 -0.03
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"A diagonal da matriz psi com m=2 é:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{,}\FunctionTok{round}\NormalTok{(AF3}\SpecialCharTok{$}\NormalTok{uniquenesses,}\DecValTok{2}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## A diagonal da matriz psi com m=2 é:
+##  0.04 0.01 0.09 0.05 0.31 0.01 0.03
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"A matriz LLT:"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## A matriz LLT:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{round}\NormalTok{(AF3\_LLT,}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       x1    x2    x3    x4    x5    x6    x7
+## x1 0.961 0.931 0.911 0.556 0.731 0.676 0.927
+## x2 0.931 0.987 0.846 0.541 0.745 0.461 0.952
+## x3 0.911 0.846 0.913 0.675 0.743 0.669 0.818
+## x4 0.556 0.541 0.675 0.955 0.703 0.163 0.381
+## x5 0.731 0.745 0.743 0.703 0.695 0.333 0.660
+## x6 0.676 0.461 0.669 0.163 0.333 0.988 0.583
+## x7 0.927 0.952 0.818 0.381 0.660 0.583 0.967
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Matriz de correlação aproximada:"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Matriz de correlação aproximada:
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resAF2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        x1     x2     x3     x4     x5     x6     x7
+## x1  0.000  0.012 -0.034 -0.001 -0.023 -0.024  0.017
+## x2  0.012  0.000 -0.049 -0.099 -0.001 -0.129  0.088
+## x3 -0.034 -0.049  0.000  0.071 -0.105  0.034 -0.009
+## x4 -0.001 -0.099  0.071  0.000 -0.111  0.119 -0.066
+## x5 -0.023 -0.001 -0.105 -0.111  0.000  0.055 -0.086
+## x6 -0.024 -0.129  0.034  0.119  0.055  0.000 -0.147
+## x7  0.017  0.088 -0.009 -0.066 -0.086 -0.147  0.000
+\end{verbatim}
+
+\hypertarget{d}{%
+\paragraph{D)}\label{d}}
+
+\[
+\begin{itemize}
+  \item Hipótese nula ($H_0$): ...
+  \item Hipótese alternativa ($H_1$): ...
+\end{itemize}
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#d)}
+
+\CommentTok{\#m=2}
+\FunctionTok{dim}\NormalTok{(AF2}\SpecialCharTok{$}\NormalTok{loadings)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 7 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n }\OtherTok{=} \FunctionTok{dim}\NormalTok{(data)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{p }\OtherTok{=} \FunctionTok{dim}\NormalTok{(AF2}\SpecialCharTok{$}\NormalTok{loadings)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{m }\OtherTok{=} \FunctionTok{dim}\NormalTok{(AF2}\SpecialCharTok{$}\NormalTok{loadings)[}\DecValTok{2}\NormalTok{]}
+
+\NormalTok{AF2\_teste\_stat }\OtherTok{=}\NormalTok{ AF2}\SpecialCharTok{$}\NormalTok{chi}
+\NormalTok{AF2\_pvalue }\OtherTok{=}\NormalTok{ AF2}\SpecialCharTok{$}\NormalTok{PVAL}
+
+\CommentTok{\#m=3}
+\FunctionTok{dim}\NormalTok{(AF3}\SpecialCharTok{$}\NormalTok{loadings)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 7 3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n }\OtherTok{=} \FunctionTok{dim}\NormalTok{(data)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{p }\OtherTok{=} \FunctionTok{dim}\NormalTok{(AF3}\SpecialCharTok{$}\NormalTok{loadings)[}\DecValTok{1}\NormalTok{]}
+\NormalTok{m }\OtherTok{=} \FunctionTok{dim}\NormalTok{(AF3}\SpecialCharTok{$}\NormalTok{loadings)[}\DecValTok{2}\NormalTok{]}
+
+\NormalTok{AF2\_teste\_stat }\OtherTok{=}\NormalTok{ AF3}\SpecialCharTok{$}\NormalTok{chi}
+\NormalTok{AF2\_pvalue }\OtherTok{=}\NormalTok{ AF3}\SpecialCharTok{$}\NormalTok{PVAL}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

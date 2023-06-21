@@ -237,7 +237,7 @@ Podemos notar que a primeira componente exxplica 65% da variancia dos dados
 \newpage
 ### Questao 4 (9.19)
 
-
+Para essa seção estaremos trabalhando com a seguinte matriz de correlação:
 ```{r include=FALSE}
 names = c("x1","x2","x3","x4","x5","x6","x7")
 data <- read_excel("table9_12-SalespeopleData.xlsx", 
@@ -252,7 +252,7 @@ kable(cor_data)
 ```
 
 
-\newpage
+
 #### A)
 
 Vamos usar a função principa() para obter a analise fatorial com m=2 e m=3
