@@ -1,0 +1,536 @@
+---
+title: "Lista Analise Fatorial"
+author: "Davi Wentrick Feijó"
+date: "2023-06-22"
+output: 
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    highlight: tango
+    toc_depth : 4
+  html_document:
+    toc: false
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats)
+```
+
+
+### 9.1) 
+
+Mostre que a matriz de covriancia $\rho$:
+```{r echo=FALSE}
+p = matrix(c(1.0,0.63,0.45,
+             0.63,1.0,0.35,
+             0.45,0.35,1.0),nrow = 3)
+p
+```
+
+E a matriz de variancia dos erros $\Psi$
+```{r echo=FALSE}
+psi = matrix(c(0.19,0,0,
+               0,0.51,0,
+               0,0,0.75),ncol = 3)
+psi
+```
+
+Escreva $\rho$ na forma $\rho = LL^T + \Psi$
+
+Para isso primeiro vamos encontrar a matriz $LL^T$
+```{r}
+LLT = p - psi #diagonais contem a comunalidade
+LLT
+```
+
+Agora podemos reconstruir a matriz na forma desejada
+```{r}
+p_construido = LLT + psi
+p_construido
+```
+
+### 9.2) 
+
+#### a)
+```{r}
+comuna = diag(LLT)
+comuna
+```
+
+#### b)
+```{r}
+#cor_xf = Lestimado[1]/(1*comu[1])
+```
+
+
+### 9.3) 
+
+Para calcular a pelo metodo de PCA precisamos encontrar os autovalores e autovetores da matriz $\rho$
+```{r}
+eigen_p = eigen(p)
+
+autoval <- eigen_p$values
+
+autovet <- eigen_p$vectors
+```
+
+Sabemos que a matriz diagonal D contem a $\sqrt{\lambda_i}$ ou seja a raiz dos autovalores
+```{r}
+D <- matrix(0, nrow = 3, ncol = 3)
+diag(D) <- sqrt(autoval)
+```
+
+Podemos encontrar a matriz L por meio de $L = e_i \cdot \sqrt{\lambda_i}$, ou seja é a multiplicacao da matriz contendo os autovetores pela matriz diagonal com a raiz dos autovalores
+```{r}
+Lestimado <- (autovet%*%D)[,1]
+LTestimado <- t(Lestimado)
+```
+
+E assim podemos finalmente obter nossa matriz $LL^T$
+```{r}
+LLT <- Lestimado%*%LTestimado
+LLT
+```
+
+Sabemos que a comunalidade $\hat{h^2}$ pode ser obtida como $\hat{h^2} = L^2$
+```{r}
+comu <- Lestimado^2
+comu
+```
+
+A matriz de variancia dos erros pode ser obtida realizando $\hat\Psi = \Sigma - LL^T$
+```{r}
+psiestimado <- diag(p-LLT)
+psiestimado
+```
+
+Podemos obter a matriz de residuos fazendo $\Sigma - \hat\Sigma$
+```{r}
+residuo = p - (LLT+psi)
+```
+
+Calculo da variancia explicada pelos autovalores 
+```{r}
+var_explained = autoval/sum(autoval)
+var_explained
+```
+
+Podemos verificar tudo isso rodando a funcao que faz a analise fatorial com 1 fator
+```{r}
+principal(p, nfactors = 1, rotate = 'none',covar = TRUE)
+```
+
+obs: Como estamos com 1 fator usamos para os calculos a primeira componente, ou seja somente o primeiro autovetor e autovalor.
+
+### 9.14) Reproducao do exemplo 9.14 do livro
+
+Vamos obter a partir da seguinte matriz de correlacao (Chicken-Bone Data) a analise fatoria pelo metodo das Componentes Principais e Maximo Verossimilhanca
+```{r}
+variable_names <- c("Skull Length", "Skull Breadth", "Femur Length", "Tibia Length", "Humerus Length", "Ulna Length")
+
+
+R = matrix(c(1.000, 0.505, 0.569, 0.602, 0.621, 0.603,
+             0.505, 1.000, 0.422, 0.467, 0.482, 0.450,
+             0.569, 0.422, 1.000, 0.926, 0.877, 0.878,
+             0.602, 0.467, 0.926, 1.000, 0.874, 0.894,
+             0.621, 0.482, 0.877, 0.874, 1.000, 0.937,
+             0.603, 0.450, 0.878, 0.894, 0.937, 1.000),ncol = 6)
+
+colnames(R) <- variable_names
+rownames(R) <- variable_names
+```
+
+Analise Fatorial PCA
+```{r}
+AF_prin = principal(R, nfactors = 3, rotate = 'none',
+                    covar = TRUE)
+
+print(AF_prin, digits=3, cutoff=.0003)
+
+AF_prin$communality
+
+round(AF_prin$uniquenesses,2)
+
+AF_prin$loadings
+```
+
+Analise Fatorial EMV
+```{r}
+AF_EMV = factanal(covmat = R, factors = 3, rotation = "none")
+
+print(AF_EMV, digits=3, cutoff=.0003)
+
+round(AF_EMV$uniquenesses,2)
+AF_EMV$loadings
+```
+
+Gráfico dos agrupamentos
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+par(mfrow = c(1,2))
+plot(AF_prin$loadings[,1], 
+     AF_prin$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "PCA")
+abline(h = 0, v = 0)
+
+text(AF_prin$loadings[,1]-0.04, 
+     AF_prin$loadings[,2]+0.04,
+     colnames(R),
+     col="blue")
+abline(h = 0, v = 0)
+
+plot(AF_EMV$loadings[,1], 
+     AF_EMV$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "EMV")
+abline(h = 0, v = 0)
+
+text(AF_EMV$loadings[,1]-0.04, 
+     AF_EMV$loadings[,2]+0.04,
+     colnames(R),
+     col="blue")
+abline(h = 0, v = 0)
+```
+
+### 9.6)
+```{r}
+
+```
+
+### 9.10)
+
+Usando os dados da Matriz de correlacao do exemplo 9.14 (Chicken-Bone Data)
+
+#### a) Variancia especifica $(\Psi)$
+```{r}
+LLT = AF_EMV$loadings %*% t(AF_EMV$loadings) 
+psi = diag(R - LLT)
+psi
+```
+
+#### b) As Comunalidades $(h^2)$
+```{r}
+comu = LLT^2
+comu
+```
+
+#### c) Proporcao da variancia explicada por cada fator
+```{r}
+eigen_r = eigen(R)
+
+autoval <- eigen_r$values
+
+autovet <- eigen_r$vectors
+
+var_explained = autoval/sum(autoval)
+var_explained
+```
+
+#### d) A matriz de residuos
+```{r}
+residuos = R - (LLT+psi)
+residuos
+```
+
+### 9.19)
+```{r message=FALSE, warning=FALSE}
+names = c("sales_growth","sales_profitability","new_account_sales","creativity_test","mechanical_reasoning_test","abstract_reasoning_test","mathematics_test")
+data <- read_excel("table9_12-SalespeopleData.xlsx", 
+                   col_names = names, col_types = c("numeric", 
+                                                    "numeric", "numeric", "numeric", 
+                                                    "numeric", "numeric", "numeric"))
+cor_data = cor(as.matrix(data))
+```
+
+#### a)
+```{r message=FALSE, warning=FALSE}
+AF2 <- principal(cor_data, nfactors = 2, rotate = 'none', covar = T,n.obs = 50)
+AF3 <- principal(cor_data, nfactors = 3, rotate = 'none', covar = T,n.obs = 50)
+```
+
+```{r}
+AF2
+AF3
+```
+
+#### b)
+```{r message=FALSE, warning=FALSE}
+AF2_rotated <- principal(cor_data, nfactors = 2, rotate = 'varimax', covar = T,n.obs = 50)
+AF3_rotated <- principal(cor_data, nfactors = 3, rotate = 'varimax', covar = T,n.obs = 50)
+```
+
+```{r}
+AF2_rotated
+AF3_rotated
+```
+
+#### c)
+Vamos calcular a comunalidade, variancia especifica, a matriz $LL^T$ e a matriz de residuos para m=2
+```{r message=FALSE, warning=FALSE}
+L = AF2$loadings #nao sai o resultado correto
+AF2_comu = AF2$communality
+AF2_psi = diag(AF2$uniquenesses)
+AF2_LLT = L %*% t(L)
+resAF2 <- round(cor(data) - AF2_LLT - AF2_psi,3)
+```
+```{r}
+AF2_comu
+AF2_psi
+AF2_LLT
+resAF2
+```
+
+Vamos calcular a comunalidade, variancia especifica, a matriz $LL^T$ e a matriz de residuos para m=3
+```{r message=FALSE, warning=FALSE}
+AF3_comu = AF3$loadings^3
+AF3_psi = diag(AF3$uniquenesses)
+AF3_LLT = AF3$loadings %*% t(AF3$loadings)
+resAF3 <- round(cor(data) - AF3_LLT - AF3_psi,3)
+```
+
+```{r}
+AF3_comu
+AF3_psi
+AF3_LLT
+resAF3
+```
+
+#### d)
+```{r message=FALSE, warning=FALSE}
+#m=2
+dim(AF2$loadings)
+
+n = dim(data)[1]
+p = dim(AF2$loadings)[1]
+m = dim(AF2$loadings)[2]
+
+AF2_teste_stat = AF2$chi
+AF2_pvalue = AF2$PVAL
+```
+
+```{r echo=FALSE}
+cat("A estatistica do teste é:", AF2_teste_stat)
+cat("O p-valor obtido foi:", AF2_pvalue)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+#m=3
+dim(AF3$loadings)
+
+n = dim(data)[1]
+p = dim(AF3$loadings)[1]
+m = dim(AF3$loadings)[2]
+
+AF3_teste_stat = AF3$chi
+AF3_pvalue = AF3$PVAL
+```
+
+```{r echo=FALSE}
+cat("A estatistica do teste é:", AF3_teste_stat)
+cat("O p-valor obtido foi:", AF3_pvalue)
+```
+
+
+### 9.21)
+
+Primieras observacoes (head) dos dados de analise (Air Polution Data)
+```{r echo=FALSE}
+#air polution data 
+dt = c(8,98,7,2,12,8,2,7,107,4,3,9,5,3,7,103,4,3,5,6,3,10,88,5,2,8,15,4,
+       6,91,4,2,8,10,3, 8,90,5,2,12,12,4,9,84,7,4,12,15,5,5,72,6,4,21,14,4,
+       7,82,5,1,11,11,3,8,64,5,2,13,9,4,6,71,5,4,10,3,3,6,91,4,2,12,7,3,
+       7,72,7,4,18,10,3,10,70,4,2,11,7,3,10,72,4,1,8,10,3,9,77,4,1,9,10,3,
+       8,76,4,1,7,7,3,8,71,5,3,16,4,4,9,67,4,2,13,2,3,9,69,3,3,9,5,3,
+       10,62,5,3,14,4,4,9,88,4,2,7,6,3,8,80,4,2,13,11,4,5,30,3,3,5,2,3,
+       6,83,5,1,10,23,4,8,84,3,2,7,6,3,6,78,4,2,11,11,3,8,79,2,1,7,10,3,
+       6,62,4,3,9,8,3,10,37,3,1,7,2,3,8,71,4,1,10,7,3,7,52,4,1,12,8,4,
+       5,48,6,5,8,4,3,6,75,4,1,10,24,3,10,35,4,1,6,9,2,8,85,4,1,9,10,2,
+       5,86,3,1,6,12,2,5,86,7,2,13,18,2,7,79,7,4,9,25,3,7,79,5,2,8,6,2,
+       6,68,6,2,11,14,3,8,40,4,3,6,5,2)
+
+dados = matrix(dt,ncol = 7, byrow = TRUE)
+colnames(dados) = c("wind","solar_radiation","CO","NO","NO2","O3","HC")
+head(dados)
+```
+
+Matriz de covariancia
+```{r}
+S_cov = cov(dados)
+S_cov
+```
+
+
+```{r}
+AF_prin = principal(S_cov, nfactors = 2, rotate = 'none',
+                    covar = TRUE)
+
+round(AF_prin$uniquenesses,2)
+
+AF_prin$loadings
+```
+
+
+```{r}
+AF_EMV = factanal(covmat = S_cov, factors = 2, rotation = "none")
+
+round(AF_EMV$uniquenesses,2)
+
+AF_EMV$loadings
+```
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+par(mfrow = c(1,2))
+plot(AF_prin$loadings[,1], 
+     AF_prin$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "PCA")
+abline(h = 0, v = 0)
+
+text(AF_prin$loadings[,1]-0.04, 
+     AF_prin$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
+plot(AF_EMV$loadings[,1], 
+     AF_EMV$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "EMV")
+abline(h = 0, v = 0)
+
+text(AF_EMV$loadings[,1]-0.04, 
+     AF_EMV$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+```
+
+### 9.22)
+
+```{r}
+AF_EMV_regression = factanal(x = dados, factors = 2, rotation = "none",scores = "regression")
+head(AF_EMV_regression$scores)
+```
+
+
+```{r}
+AF_EMV_least_squares = factanal(x = dados, factors = 2, rotation = "none", scores = "Bartlett")
+head(AF_EMV_least_squares$scores)
+```
+
+
+```{r}
+AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar=TRUE, scores=TRUE)
+head(AF_prin$scores)
+```
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+par(mfrow = c(1,3))
+plot(AF_EMV_regression$scores[,1], 
+     AF_EMV_regression$scores[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "Scores Regression")
+abline(h = 0, v = 0)
+
+plot(AF_EMV_least_squares$scores[,1], 
+     AF_EMV_least_squares$scores[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "Scores Least Squares")
+abline(h = 0, v = 0)
+
+plot(AF_prin$scores[,1], 
+     AF_prin$scores[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "Scores PCA")
+abline(h = 0, v = 0)
+```
+
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+par(mfrow = c(1,3))
+plot(AF_EMV_regression$loadings[,1], 
+     AF_EMV_regression$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "Regression")
+abline(h = 0, v = 0)
+
+text(AF_EMV_regression$loadings[,1]-0.04, 
+     AF_EMV_regression$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
+plot(AF_EMV_least_squares$loadings[,1], 
+     AF_EMV_least_squares$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "Least Squares")
+abline(h = 0, v = 0)
+
+text(AF_EMV_least_squares$loadings[,1]-0.04, 
+     AF_EMV_least_squares$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
+plot(AF_prin$loadings[,1], 
+     AF_prin$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "PCA")
+abline(h = 0, v = 0)
+
+text(AF_prin$loadings[,1]-0.04, 
+     AF_prin$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+```
+
+### 9.23)
+```{r}
+
+```
+
+### 9.25)
+```{r}
+
+
+```
+
+

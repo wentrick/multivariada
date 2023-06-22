@@ -22,7 +22,7 @@ cor(stock)
 
 af1stock <- principal(stock, nfactors = 1, rotate = 'none',
                       covar = FALSE)
-af1stock$
+af1stock
 
 resaf1stock <- (round(cor(stock) 
                       - af1stock$loadings %*% t(af1stock$loadings)

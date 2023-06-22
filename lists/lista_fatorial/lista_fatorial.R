@@ -64,6 +64,8 @@ R = matrix(c(1.000, 0.505, 0.569, 0.602, 0.621, 0.603,
 AF_prin = principal(R, nfactors = 3, rotate = 'none',
                     covar = TRUE)
 
+print(AF_prin, digits=3, cutoff=.0003)
+
 AF_prin$communality
 
 round(AF_prin$uniquenesses,2)
@@ -71,6 +73,9 @@ round(AF_prin$uniquenesses,2)
 AF_prin$loadings
 
 AF_EMV = factanal(covmat = R, factors = 3, rotation = "none")
+
+print(AF_EMV, digits=3, cutoff=.0003)
+
 round(AF_EMV$uniquenesses,2)
 AF_EMV$loadings
 
@@ -114,14 +119,14 @@ cor_data = cor(as.matrix(data))
 
 #a)
 AF2 <- principal(cor_data, nfactors = 2, rotate = 'none',
-                 covar = F,n.obs = 50)
+                 covar = T,n.obs = 50)
 AF3 <- principal(cor_data, nfactors = 3, rotate = 'none',
-                 covar = F,n.obs = 50)
+                 covar = T,n.obs = 50)
 #b)
 AF2_rotated <- principal(cor_data, nfactors = 2, rotate = 'varimax',
-                         covar = F,n.obs = 50)
+                         covar = T,n.obs = 50)
 AF3_rotated <- principal(cor_data, nfactors = 3, rotate = 'varimax',
-                         covar = F,n.obs = 50)
+                         covar = T,n.obs = 50)
 #c)
 
 AF2_comu = AF2$loadings^2
@@ -154,8 +159,8 @@ n = dim(data)[1]
 p = dim(AF3$loadings)[1]
 m = dim(AF3$loadings)[2]
 
-AF2_teste_stat = AF3$chi
-AF2_pvalue = AF3$PVAL
+AF3_teste_stat = AF3$chi
+AF3_pvalue = AF3$PVAL
 
 #9.21) --------------------------------------------------------------------------
 #air polution data 
@@ -179,6 +184,22 @@ S_cov = cov(dados)
 AF_prin = principal(S_cov, nfactors = 2, rotate = 'none',
                     covar = TRUE)
 
+par(mfrow = c(1,2))
+plot(AF_prin$loadings[,1], 
+     AF_prin$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "PCA")
+abline(h = 0, v = 0)
+
+text(AF_prin$loadings[,1]-0.04, 
+     AF_prin$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
 AF_prin$communality
 
 round(AF_prin$uniquenesses,2)
@@ -187,15 +208,52 @@ AF_prin$loadings
 
 AF_EMV = factanal(covmat = S_cov, factors = 2, rotation = "none")
 
+plot(AF_EMV$loadings[,1], 
+     AF_EMV$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "EMV")
+abline(h = 0, v = 0)
+
+text(AF_EMV$loadings[,1]-0.04, 
+     AF_EMV$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
 round(AF_EMV$uniquenesses,2)
 
 AF_EMV$loadings
 
 #9.22) --------------------------------------------------------------------------
 
-AF_EMV_regression = factanal(covmat = S_cov, factors = 2, rotation = "none",scores = "regression")
+AF_EMV_regression = factanal(x = dados, factors = 2, rotation = "none",scores = "regression")
+AF_EMV_regression$scores
 
-AF_EMV_least_squares = factanal(covmat = S_cov, factors = 2, rotation = "none", scores = "Bartlett")
+par(mfrow = c(1,3))
+plot(AF_EMV_regression$loadings[,1], 
+     AF_EMV_regression$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "No rotation")
+abline(h = 0, v = 0)
+
+text(AF_EMV_regression$loadings[,1]-0.04, 
+     AF_EMV_regression$loadings[,2]+0.04,
+     colnames(dados),
+     col="blue")
+abline(h = 0, v = 0)
+
+AF_EMV_least_squares = factanal(x = dados, factors = 2, rotation = "none", scores = "Bartlett")
+AF_EMV_least_squares$scores
+
+AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar = TRUE)
+
+AF_prin$values
 
 #9.23) --------------------------------------------------------------------------
 
