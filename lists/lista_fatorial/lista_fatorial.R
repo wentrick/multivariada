@@ -256,6 +256,31 @@ AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar = TRUE)
 AF_prin$values
 
 #9.23) --------------------------------------------------------------------------
+R = cov(dados)
+S = cov(dados[, c("wind","solar_radiation","NO2","O3")]) #amostra
+
+#a)
+
+AF_prin_1 = principal(S, nfactors = 1, rotate = 'none', covar = TRUE)
+
+AF_prin_2 = principal(S, nfactors = 2, rotate = 'none', covar = TRUE)
+
+#b)
+
+AF_EMV_1 = factanal(covmat = S, factors = 1, rotation = "none")
+
+AF_EMV_2 = factanal(covmat = S, factors = 2, rotation = "none") #nao aceita 2 fatores para 4 variaveis
+
+AF_EMV_1$uniquenesses #psi
+
+AF_EMV_1$loadings #L
+
+#c)
+
+
+AF_prin_1
+
+AF_EMV_1
 
 #9.25) --------------------------------------------------------------------------
 
