@@ -1,0 +1,279 @@
+---
+title: "Lista Normal Multivariada"
+author: "Davi Wentrick Feijó"
+date: "2023-06-25"
+output: 
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    highlight: tango
+    toc_depth : 4
+  html_document:
+    toc: false
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,rmdformats,MASS,mvtnorm,car,psych)
+```
+
+### 55)
+
+```{r}
+rmvn.svd <-
+  function(n, mu, Sigma) {
+    p <- length(mu)
+    S <- svd(Sigma)
+    R <- S$u %*% diag(sqrt(S$d)) %*% t(S$v)
+    Z <- matrix(rnorm(n*p), nrow=n, ncol=p)
+    X <- Z %*% R + matrix(mu, n, p, byrow=TRUE)
+    X
+  }
+
+n=100
+mu <- c(3, 2)
+Sigma <- matrix(c(1, -1.5, -1.5, 4), 
+                nrow = 2, ncol = 2)
+
+results = rmvn.svd(n,mu,Sigma)
+head(results)
+```
+
+
+### 56)
+
+Seja:
+$$
+Z \sim N_P(0,I_p)
+$$
+$$
+\sum_{i=1}^{p}Z_i^2 = Z^TZ \sim \chi^2_p
+$$
+Mas
+
+$$
+Z^TZ = (Y - \mu)^T(\Sigma^{1/2})^{-1}(\Sigma^{1/2})^{-1}(Y - \mu)
+$$
+$$
+Z^TZ = (Y - \mu)^T\Sigma^{-1}(Y - \mu) \sim \chi^2_p
+$$
+
+### 57)
+
+```{r}
+a = -1/2
+n=1000
+mu <- c(1, 2)
+Sigma <- matrix(c(2, a, a, 2), 
+                nrow = 2, ncol = 2)
+
+r1 = rmvn.svd(n,mu,Sigma)
+
+
+dataEllipse(r1,pch=20, 
+            main= "a = -0.5")
+```
+
+
+```{r}
+a = 1/2
+n=1000
+mu <- c(1, 2)
+Sigma <- matrix(c(2, a, a, 2), 
+                nrow = 2, ncol = 2)
+
+r1 = rmvn.svd(n,mu,Sigma)
+
+
+dataEllipse(r1,pch=20, 
+            main= "a = 0.5")
+```
+
+
+```{r}
+a = 1
+n=1000
+mu <- c(1, 2)
+Sigma <- matrix(c(2, a, a, 2), 
+                nrow = 2, ncol = 2)
+
+r1 = rmvn.svd(n,mu,Sigma)
+
+
+dataEllipse(r1,pch=20, 
+            main= "a = 1")
+```
+
+
+### 58)
+
+$$
+A = [1,1]  \ \ \ \  B = [1,-1]
+$$
+
+$AY$ e $BY$ sao idependentes se:
+
+$$
+A\Sigma B^T = 0
+$$
+
+```{r}
+mu <- c(2, 2)
+Sigma <- matrix(c(1, 0, 0, 1), 
+                nrow = 2, ncol = 2)
+a = c(1,1)
+b = c(1,-1)
+
+t(a) %*% Sigma %*% b #formual do slide nao funciona mas essa sim verificar
+
+#acredito que o R por padrao use os vetores como coluna e nao linha, diferente da demonstracao do slide que assumimos que sao linhas
+#logo temos que inverter e comecar com a transposta mas nao tenho certeza 
+
+```
+
+
+
+### 59)
+
+### 60) Johnson e Wichern - Exercício 4.26
+Nossos dados do problema 
+```{r echo=FALSE}
+x1 = c(1,2,3,3,4,5,6,8,9,11)
+x2 = c(18.95,19,17.95,15.54,14,12.95,8.94,7.49,6,3.99)
+dados = data.frame(x1,x2)
+dados
+```
+
+Matriz de covariancia 
+```{r}
+S = cov(dados)
+S
+```
+
+#### a)
+Para o calculo da distancia vamos usar a seguinte formula:
+
+$$
+m^2_j = A S^{-1}A^T
+$$
+Onde A é nosso vetor que contem a diferenca da observacao para a media:
+
+$$
+A = [X_{j1};X_{j2}]-[\bar{X_1};\bar{X_2}] = [X_{j1} - \bar{X_1};X_{j2}- \bar{X_2}]
+$$
+
+```{r}
+results = c()
+for (i in c(1:10)){
+  media = c(mean(x1),mean(x2))
+  obs = c(x1[i],x2[i])
+  m = t(obs-media) %*% solve(S) %*% (obs-media)
+  results[i] = m
+}
+
+results
+```
+
+#### b)
+
+Queremos as observacoes dentro do contorno de 50% da distribuicao normal. Sabemos que nesse caso a nossa distribuicao segue uma $\chi_2^2$ logo queremos as observacoes menores que $\chi_2^2(0.5)$ que podemos calcular usando o R:
+
+```{r}
+qchisq(0.5,2)
+```
+Filtrando nosso vetor de resultados temos:
+```{r}
+results[results < qchisq(0.5,2)]
+```
+
+#### c)
+
+Vamos ordenar as obsevacoes:
+
+```{r}
+obs_ordenadas = sort(results)
+```
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+plot(obs_ordenadas)
+```
+
+#### D)
+
+### 61) Johnson e Wichern - Exercício 4.27
+
+```{r}
+oven_number = c(1:42)
+radiation = c(0.15,0.09,0.18,0.10,0.05,0.12,0.08,0.05,0.08,0.10,0.7,0.02,0.01,0.10,
+              0.10,0.10,0.02,0.10,0.01,0.40,0.10,0.05,0.03,0.05,0.15,0.10,0.15,0.09,
+              0.08,0.18,0.10,0.20,0.11,0.30,0.02,0.20,0.20,0.30,0.30,0.40,0.30,0.05)
+dados = data.frame(oven_number,radiation)
+```
+
+
+```{r}
+obs_ordenadas = sort(unique(radiation))
+log_obs = log(obs_ordenadas)
+```
+
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+qqnorm(log_obs)
+qqline(log_obs)
+```
+
+
+
+### 62) Johnson e Wichern - Exercício 4.35
+
+### 63) Rencher e Christensen - Problema 4.1
+
+```{r}
+sigma1 <- matrix(c(14, 8, 3,
+                    8, 5, 2,
+                    3, 2, 1), nrow = 3)
+
+sigma2 <- matrix(c(6, 6, 1,
+                   6, 8, 2,
+                   1, 2, 1), nrow = 3)
+```
+
+Vamos calcular a variancia total e generalizada para cada um dos Sigmas!
+
+Sigma 1:
+```{r}
+var_tot = tr(sigma1)
+var_gen = det(sigma1)
+```
+
+```{r echo=FALSE}
+cat("A variancia total de Sigma 1 é:",var_tot)
+cat("A variancia generalizada de Sigma 1 é:",var_gen)
+```
+
+Sigma 2:
+```{r}
+var_tot = tr(sigma2)
+var_gen = det(sigma2)
+```
+
+```{r echo=FALSE}
+cat("A variancia total de Sigma 1 é:",var_tot)
+cat("A variancia generalizada de Sigma 1 é:",var_gen)
+```
+
+
+
+### 64) Rencher e Christensen - Problema 4.2
+### 65) Rencher e Christensen - Problema 4.10
+### 66) Rencher e Christensen - Problema 4.11
+### 67) Rencher e Christensen - Problema 4.12
+### 68) Rencher e Christensen - Problema 4.13
+### 69) Rencher e Christensen - Problema 4.14
+### 70) Rencher e Christensen - Problema 4.17
+
+

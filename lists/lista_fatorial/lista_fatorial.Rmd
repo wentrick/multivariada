@@ -18,7 +18,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats)
+pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats,ACSWR,nFactors)
 ```
 
 
@@ -40,9 +40,16 @@ psi = matrix(c(0.19,0,0,
 psi
 ```
 
-Escreva $\rho$ na forma $\rho = LL^T + \Psi$
+Podemos escrever $\rho$ na forma $\rho = LL^T + \Psi$
 
-Para isso primeiro vamos encontrar a matriz $LL^T$
+Para isso primeiro vamos encontrar a matriz $LL^T$ ou como ja temos nosso $\Psi$ podemos subtarair da diagonald de $\rho$
+
+```{r}
+L = c(0.9, 0.7, 0.5) #dado pelo exercicio
+L %*% t(L)
+```
+
+
 ```{r}
 LLT = p - psi #diagonais contem a comunalidade
 LLT
@@ -57,20 +64,27 @@ p_construido
 ### 9.2) 
 
 #### a)
+
+A comunalidade é $\hat{h}^2 = \ell^2$. Vale notar que esse calculo pode ser feito $L^2$ ou pegando a diagonal da matriz $LL^T$
+
+OBS: A matriz L na analise fatorial por componente principais é composta por $\sqrt{\lambda_i}e_i$ onde $\lambda$ é o autovalor e $e_i$ o respectivo autovetor 
 ```{r}
 comuna = diag(LLT)
 comuna
 ```
 
 #### b)
+
+Para encontrar a correlacao entre $corr(Z_i,F_1) = \ell_{i,1}$ que nada mais é que nossa matriz L
+
 ```{r}
-#cor_xf = Lestimado[1]/(1*comu[1])
+sqrt(comuna)
 ```
 
 
 ### 9.3) 
 
-Para calcular a pelo metodo de PCA precisamos encontrar os autovalores e autovetores da matriz $\rho$
+Para calcular pelo metodo de PCA precisamos encontrar os autovalores e autovetores da matriz $\rho$
 ```{r}
 eigen_p = eigen(p)
 
@@ -89,6 +103,7 @@ Podemos encontrar a matriz L por meio de $L = e_i \cdot \sqrt{\lambda_i}$, ou se
 ```{r}
 Lestimado <- (autovet%*%D)[,1]
 LTestimado <- t(Lestimado)
+Lestimado
 ```
 
 E assim podemos finalmente obter nossa matriz $LL^T$
@@ -215,6 +230,8 @@ Usando os dados da Matriz de correlacao do exemplo 9.14 (Chicken-Bone Data)
 
 #### a) Variancia especifica $(\Psi)$
 ```{r}
+AF_EMV = factanal(covmat = R, factors = 2, rotation = "none")
+
 LLT = AF_EMV$loadings %*% t(AF_EMV$loadings) 
 psi = diag(R - LLT)
 psi
@@ -222,26 +239,34 @@ psi
 
 #### b) As Comunalidades $(h^2)$
 ```{r}
-comu = LLT^2
+L = as.data.frame(AF_EMV$loadings[,1:2]) #verificar
+L^2
+```
+
+
+```{r}
+comu = diag(R - diag(psi))
 comu
+1 - AF_EMV$uniquenesses 
 ```
 
 #### c) Proporcao da variancia explicada por cada fator
+Fator 1:
 ```{r}
-eigen_r = eigen(R)
+n = length(colnames(R))
+L2 = L^2
+sum(L2[,1])/n
+```
 
-autoval <- eigen_r$values
-
-autovet <- eigen_r$vectors
-
-var_explained = autoval/sum(autoval)
-var_explained
+Fator 2:
+```{r}
+sum(L2[,2])/n
 ```
 
 #### d) A matriz de residuos
 ```{r}
 residuos = R - (LLT+psi)
-residuos
+round(residuos,3)
 ```
 
 ### 9.19)
@@ -368,13 +393,13 @@ head(dados)
 
 Matriz de covariancia
 ```{r}
-S_cov = cov(dados)
-S_cov
+S = cov(dados[, c("wind","solar_radiation","NO2","O3")])
+S
 ```
 
 
 ```{r}
-AF_prin = principal(S_cov, nfactors = 2, rotate = 'none',
+AF_prin = principal(S, nfactors = 2, rotate = 'varimax',
                     covar = TRUE)
 
 round(AF_prin$uniquenesses,2)
@@ -384,11 +409,11 @@ AF_prin$loadings
 
 
 ```{r}
-AF_EMV = factanal(covmat = S_cov, factors = 2, rotation = "none")
+#AF_EMV = factanal(covmat = S, factors = 2, rotation = "none")
 
-round(AF_EMV$uniquenesses,2)
+#round(AF_EMV$uniquenesses,2)
 
-AF_EMV$loadings
+#AF_EMV$loadings
 ```
 
 ```{r echo=FALSE,fig.align='center',out.width = "100%"}
@@ -408,39 +433,39 @@ text(AF_prin$loadings[,1]-0.04,
      col="blue")
 abline(h = 0, v = 0)
 
-plot(AF_EMV$loadings[,1], 
-     AF_EMV$loadings[,2],
-     xlab = "Factor 1", 
-     ylab = "Factor 2", 
-     ylim = c(-1,1),
-     xlim = c(-1,1),
-     main = "EMV")
-abline(h = 0, v = 0)
-
-text(AF_EMV$loadings[,1]-0.04, 
-     AF_EMV$loadings[,2]+0.04,
-     colnames(dados),
-     col="blue")
-abline(h = 0, v = 0)
+# plot(AF_EMV$loadings[,1], 
+#      AF_EMV$loadings[,2],
+#      xlab = "Factor 1", 
+#      ylab = "Factor 2", 
+#      ylim = c(-1,1),
+#      xlim = c(-1,1),
+#      main = "EMV")
+# abline(h = 0, v = 0)
+# 
+# text(AF_EMV$loadings[,1]-0.04, 
+#      AF_EMV$loadings[,2]+0.04,
+#      colnames(dados),
+#      col="blue")
+# abline(h = 0, v = 0)
 ```
 
 ### 9.22)
 
 ```{r}
-AF_EMV_regression = factanal(x = dados, factors = 2, rotation = "none",scores = "regression")
-head(AF_EMV_regression$scores)
+#AF_EMV_regression = factanal(x = dados[, c("wind","solar_radiation","NO2","O3")], factors = 2, rotation = "none",scores = "regression")
+#head(AF_EMV_regression$scores)
 ```
 
 
 ```{r}
-AF_EMV_least_squares = factanal(x = dados, factors = 2, rotation = "none", scores = "Bartlett")
-head(AF_EMV_least_squares$scores)
+#AF_EMV_least_squares = factanal(x = dados, factors = 2, rotation = "none", scores = "Bartlett")
+#head(AF_EMV_least_squares$scores)
 ```
 
 
 ```{r}
-AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar=TRUE, scores=TRUE)
-head(AF_prin$scores)
+#AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar=TRUE, scores=TRUE)
+#head(AF_prin$scores)
 ```
 
 ```{r echo=FALSE,fig.align='center',out.width = "100%"}
@@ -524,13 +549,111 @@ abline(h = 0, v = 0)
 
 ### 9.23)
 ```{r}
+R = cor(dados[, c("wind","solar_radiation","NO2","O3")])
+S = cov(dados[, c("wind","solar_radiation","NO2","O3")]) 
+```
 
+#### a)
+```{r}
+AF_prin_1 = principal(R, nfactors = 1, rotate = 'none', covar = TRUE)
+
+AF_prin_2 = principal(R, nfactors = 2, rotate = 'none', covar = TRUE)
+```
+
+#### b)
+```{r}
+AF_EMV_1 = factanal(covmat = R, factors = 1, rotation = "none")
+
+AF_EMV_1$uniquenesses #psi
+
+AF_EMV_1$loadings #L
+```
+
+
+```{r}
+#AF_EMV_2 = factanal(covmat = S, factors = 2, rotation = "none") #nao aceita 2 fatores para 4 variaveis
+```
+
+#### c)
+```{r}
+AF_prin_1
+
+AF_EMV_1
 ```
 
 ### 9.25)
 ```{r}
+data(stiff) #pacote ACSWR que tem os dados do problema
+colnames(stiff) = c("shock_wave","vibration","static_test_1","static_test_1")
+head(stiff)
+```
 
 
+```{r}
+S  = cov(stiff)
+
+n = length(stiff$x1)
+```
+
+Podemos plotar um scree plot para verificar o numero de fatores ideal usando a funcao `fa.parallel()`:
+```{r message=FALSE, warning=FALSE}
+fa.parallel(stiff)
+```
+
+
+```{r}
+#AF_Stiff_EMV = factanal(covmat = S,factors = 2, n.obs = n)
+
+AF_Stiff_PCA = principal(S, nfactors = 1, rotate = 'none', covar = TRUE,scores = TRUE)
+AF_Stiff_PCA$scores
+
+
+AF_Stiff_EMV <- fa(r=S, nfactors = 1, fm="ml",rotate= "none",covar = TRUE,scores = c("regression")) 
+print(AF_Stiff_EMV)
+AF_Stiff_EMV$scores
+```
+
+```{r}
+AF_Stiff_PCA
+```
+
+```{r echo=FALSE,fig.align='center',out.width = "100%"}
+plot(AF_Stiff_PCA$loadings[,1], 
+     AF_Stiff_PCA$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "No rotation PCA")
+abline(h = 0, v = 0)
+
+text(AF_Stiff_PCA$loadings[,1]-0.04, 
+     AF_Stiff_PCA$loadings[,2]+0.04,
+     colnames(stiff),
+     col="blue")
+abline(h = 0, v = 0)
+
+```
+```{r}
+load <- AF_Stiff_EMV$loadings[,1:2]
+plot(load,
+     type="n",
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "No rotation EMV")
+abline(h = 0, v = 0)
+
+text(load,
+     colnames(stiff),
+     col="blue")
+abline(h = 0, v = 0)
+
+```
+
+```{r}
+fa.diagram(AF_Stiff_EMV$loadings)
 ```
 
 

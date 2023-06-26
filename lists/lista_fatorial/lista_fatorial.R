@@ -1,5 +1,5 @@
 
-pacman::p_load(psych,readxl,data.table,Matrix)
+pacman::p_load(psych,readxl,data.table,Matrix,ACSWR)
 #9.1) --------------------------------------------------------------------------
 
 p = matrix(c(1.0,0.63,0.45,
@@ -256,8 +256,8 @@ AF_prin = principal(S_cov, nfactors = 2, rotate = 'none', covar = TRUE)
 AF_prin$values
 
 #9.23) --------------------------------------------------------------------------
-R = cov(dados)
-S = cov(dados[, c("wind","solar_radiation","NO2","O3")]) #amostra
+R = cor(dados[, c("wind","solar_radiation","NO2","O3")])
+S = cov(dados[, c("wind","solar_radiation","NO2","O3")]) 
 
 #a)
 
@@ -277,18 +277,40 @@ AF_EMV_1$loadings #L
 
 #c)
 
-
 AF_prin_1
 
 AF_EMV_1
 
 #9.25) --------------------------------------------------------------------------
+data(stiff) #pacote ACSWR que tem os dados do problema
+colnames(stiff) = c("shock_wave","vibration","static_test_1","static_test_1")
+
+S  = cov(stiff)
+
+n = length(stiff$x1)
+
+AF_Stiff_PCA = principal(S, nfactors = 2, rotate = 'none', covar = TRUE,scores = TRUE)
+AF_Stiff_PCA$
 
 
+AF_Stiff_EMV <- fa(r=S, nfactors = 2, fm="ml",rotate= "none",covar = TRUE,scores = c("regression")) 
+print(AF_Stiff_EMV)
+AF_Stiff_EMV$scores
 
+plot(AF_Stiff_PCA$loadings[,1], 
+     AF_Stiff_PCA$loadings[,2],
+     xlab = "Factor 1", 
+     ylab = "Factor 2", 
+     ylim = c(-1,1),
+     xlim = c(-1,1),
+     main = "No rotation")
+abline(h = 0, v = 0)
 
-
-
+text(AF_Stiff_PCA$loadings[,1]-0.04, 
+     AF_Stiff_PCA$loadings[,2]+0.04,
+     colnames(stiff),
+     col="blue")
+abline(h = 0, v = 0)
 
 
 
