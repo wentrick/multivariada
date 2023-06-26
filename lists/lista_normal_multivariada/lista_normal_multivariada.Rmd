@@ -18,7 +18,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,rmdformats,MASS,mvtnorm,car,psych)
+pacman::p_load(tidyverse,rmdformats,MASS,mvtnorm,car,psych,xtable)
 ```
 
 ### 55)
@@ -269,10 +269,379 @@ cat("A variancia generalizada de Sigma 1 é:",var_gen)
 
 
 ### 64) Rencher e Christensen - Problema 4.2
+
+Com base nessa equacao:
+
+$$
+z = (T^t)^{-1}(y-\mu)
+$$
+Vale relembrar algumas propriedades da combinação linear $z = Ay + b$ (Rencher e Christensen - Pagina 81)
+
+$$
+E(Ay + b) = AE(y) + b = A \mu + b
+$$
+
+$$
+Cov(Ay + b) = A \Sigma A^t
+$$
+
+vamos mostrar que:
+$E(Z) = 0$
+
+$$
+E(z) = (T^t)^{-1}(E(y)-\mu)
+$$
+$$
+E(z) = (T^t)^{-1}(\mu-\mu) = 0
+$$
+$Cov(Z) = I$
+
+$$
+Cov(Z) = (T^t)^{-1}\Sigma[(T^t)^{-1}]^t
+$$
+Sabemos que $\Sigma = T^tT$
+
+$$
+Cov(Z) = (T^t)^{-1}T^tTT^{-1} = I
+$$
+
 ### 65) Rencher e Christensen - Problema 4.10
+
+#### a)
+Vamos utlizar a propriedade de que se $a$ é um vetor de constantes e $Y \sim N_p(\mu,\Sigma)$ entao $A^TY \sim N_p(A^T\mu,A^T\Sigma A)$ (Rencher e Christensen - Pagina 94)
+
+```{r}
+mu <- c(3,1,4)
+sigma <- matrix(c(6, 1, -2,
+                  1, 13, 4,
+                  -2, 4, 4), nrow = 3)
+a = c(2,-1,3)
+
+t(a) %*% mu
+
+t(a) %*% sigma %*% a
+
+```
+
+```{r echo=FALSE}
+cat("A função segue distribuição: N(",t(a) %*% mu,",",t(a) %*% sigma %*% a,")")
+```
+
+#### b)
+
+Primeiro temos que encontrar $Z_1$ e $Z_2$
+
+```{r}
+a =  matrix(c(1, 1, 1,
+              1, -1, 2), ncol =3, nrow =2, byrow = T)
+
+z_mu = a %*% mu
+
+z_sigma = a %*% sigma %*% t(a)
+```
+
+```{r}
+z_mu 
+
+z_sigma
+```
+
+
+```{r echo=FALSE}
+cat(" A distribuição conjunta segue distribuição: N(",z_mu,",",z_sigma,")")
+```
+
+
+#### c)
+Se $Y \sim N_p(\mu,\Sigma)$ entao cada $y_j \sim N_p(\mu_j,\Sigma_{jj})$
+
+```{r echo=FALSE}
+cat("A y2 segue distribuição: N(",mu[2],",",sigma[2,2],")")
+```
+
+
+
+#### d)
+
+A distribuição conjunta de $y_1$ e $y_3$ é:
+
+```{r}
+new_mu = c(mu[1],mu[3])
+new_sigma <- matrix(c(sigma[1,1], sigma[3,1], 
+                      sigma[1,3], sigma[3,3]), nrow = 2)
+```
+
+Onde os parametros da distribuição conjunta é:
+
+```{r echo=FALSE}
+cat("Matriz de médias")
+new_mu
+```
+
+```{r echo=FALSE}
+cat("Matriz Sigma")
+new_sigma
+```
+
+
+#### e)
+
+vamos montar nosso vetor A de acordo com a equacao dada:
+
+```{r}
+a =  matrix(c(1, 0, 0,
+              0, 0, 1,
+              0.5,0.5,0), ncol =3, nrow =2, byrow = T)
+```
+
+Matriz de médias
+```{r}
+a %*% mu
+```
+
+Matriz de covariancia
+```{r}
+a %*% sigma %*% t(a)
+
+```
+
 ### 66) Rencher e Christensen - Problema 4.11
+
+Essa é a equcao de padronizaçao da normal multivariada
+
+$$
+z = (T^t)^{-1}(y-\mu)
+$$
+#### a)
+
+Sabemos que podemos decompor a matriz $\Sigma = T^tT$ por meio da decomposicao de cholesky (`chol()`)
+```{r}
+t = chol(sigma)
+t
+```
+
+Agora vamos calcular $(T^t)^{-1}$
+```{r}
+t(solve(t))
+
+```
+
+Nosso vetor Z pode ser escrito como:
+
+\[
+\begin{pmatrix}
+   0.41 & 0.00 & 0.00 \\ 
+  -0.05 & 0.28 & 0.00 \\ 
+  0.28 & -0.25 & 0.73 \\ 
+\end{pmatrix} 
+\cdot
+\begin{pmatrix}
+y-3 \\
+y-1 \\
+y-4 \\
+\end{pmatrix}
+\]
+
+
+Podemos mostrar que ao calcular a matriz de covariancia por meio da formula $Cov(z) = (T^t)^{-1}T^tTT^{-1}$ tem que resultar na matriz identidade
+
+```{r}
+round(t(solve(t)) %*% t(t) %*% t %*% solve(t),1)
+```
+
+#### b)
+
+Vamos calcular $\Sigma^{1/2}$ e para isso vamos usar o `eigen()`. Ao realizar a decomposição precisamos somente tirar a raiz de D que é a matriz diagonal com os autovalores.
+
+```{r}
+
+eigen_sigma = eigen(sigma)
+
+sigma_raiz_inv = eigen_sigma$vectors %*% solve(diag(eigen_sigma$values^(1/2))) %*% t(eigen_sigma$vectors)
+```
+
+
+```{r}
+sigma_raiz_inv
+```
+
+\[
+\begin{pmatrix}
+   0.46 & -0.07 & 0.17 \\ 
+  -0.07 & 0.33 & -0.17 \\ 
+   0.17 & -0.17 & 0.69 \\ 
+\end{pmatrix} 
+\cdot
+\begin{pmatrix}
+y-3 \\
+y-1 \\
+y-4 \\
+\end{pmatrix}
+\]
+
+#### c)
+
+Ela segue uma distribuição qui-quadrado
+
+$$
+(y - \mu)^t \Sigma^{-1} (y - \mu) \sim \chi^2_3
+$$
+
+
 ### 67) Rencher e Christensen - Problema 4.12
+
+
+```{r}
+mu <- c(-2,3,-1,5)
+sigma <- matrix(c(11, -8, 3, 9,
+                  -8,  9,-3,-6,
+                   3, -3, 2, 3,
+                   9, -6, 3, 9), nrow = 4)
+```
+
+#### a)
+```{r}
+a = c(4,-2,1,-3)
+
+t(a) %*% mu
+
+t(a) %*% sigma %*% a
+```
+#### b)
+
+```{r}
+a = matrix(c(1, 1, 1, 1,
+            -2, 3, 1,-2),nrow = 2, byrow = TRUE)
+
+a %*% mu
+
+a %*% sigma %*% t(a)
+```
+
+
+#### c)
+
+```{r}
+a = matrix(c(3, 1,-4,-1,
+            -1, -3, 1,-2,
+             2, 2, 4,-5),nrow = 3, byrow = TRUE)
+
+a %*% mu
+
+a %*% sigma %*% t(a)
+```
+
+#### d)
+
+Se $Y \sim N_p(\mu,\Sigma)$ entao cada $y_j \sim N_p(\mu_j,\Sigma_{jj})$
+
+```{r echo=FALSE}
+cat("A y3 segue distribuição: N(",mu[3],",",sigma[3,3],")")
+```
+
+#### e)
+
+A distribuição conjunta de $y_2$ e $y_4$ é:
+
+```{r}
+new_mu = c(mu[2],mu[4])
+new_sigma <- matrix(c(sigma[2,2], sigma[4,2], 
+                      sigma[2,4], sigma[4,4]), nrow = 2)
+```
+
+
+```{r}
+new_mu
+
+new_sigma
+```
+
+#### f)
+
+```{r}
+a = matrix(c(1, 1/2, 1/2, 0,
+             1/3, 1/3, 1/3,0,
+             1/4, 1/4, 1/4, 1/4),nrow = 3, byrow = TRUE)
+
+a %*% mu
+
+a %*% sigma %*% t(a)
+```
+
 ### 68) Rencher e Christensen - Problema 4.13
+
+#### a)
+
+```{r}
+t = chol(sigma)
+t
+```
+
+Agora vamos calcular $(T^t)^{-1}$
+
+```{r}
+t(solve(t))
+```
+
+Nosso vetor Z pode ser escrito como:
+
+\[
+\begin{pmatrix}
+   0.30 & 0.00 & 0.00 & 0.00 \\ 
+   0.41 & 0.56 & 0.00 & 0.00 \\ 
+  -0.09 & 0.26 & 1.01 & 0.00 \\ 
+  -0.86 & -0.34 & -0.69 & 0.97 \\ 
+\end{pmatrix} 
+\cdot
+\begin{pmatrix}
+y+2 \\
+y-3 \\
+y+1 \\
+y-5 \\
+\end{pmatrix}
+\]
+
+#### b)
+
+Vamos calcular $\Sigma^{1/2}$ e para isso vamos usar o `eigen()`. Ao realizar a decomposição precisamos somente tirar a raiz de D que é a matriz diagonal com os autovalores.
+
+```{r}
+
+eigen_sigma = eigen(sigma)
+
+sigma_raiz_inv = eigen_sigma$vectors %*% solve(diag(eigen_sigma$values^(1/2))) %*% t(eigen_sigma$vectors)
+```
+
+```{r}
+sigma_raiz_inv
+```
+
+\[
+\begin{pmatrix}
+  0.81 & 0.31 & 0.14 & -0.48 \\ 
+  0.31 & 0.58 & 0.25 & -0.08 \\ 
+  0.14 & 0.25 & 1.15 & -0.30 \\ 
+ -0.48 & -0.08 & -0.30 & 0.79 \\
+\end{pmatrix} 
+\cdot
+\begin{pmatrix}
+y+2 \\
+y-3 \\
+y+1 \\
+y-5 \\
+\end{pmatrix}
+\]
+
+
+#### c)
+
+
+Ela segue uma distribuição qui-quadrado
+
+$$
+(y - \mu)^t \Sigma^{-1} (y - \mu) \sim \chi^2_4
+$$
+
 ### 69) Rencher e Christensen - Problema 4.14
 ### 70) Rencher e Christensen - Problema 4.17
 
