@@ -643,6 +643,15 @@ $$
 $$
 
 ### 69) Rencher e Christensen - Problema 4.14
+
+Para saber se é independente basta olhar os valores fora da diagonal da matris Sigma, ou seja se as covariancias sao iguais ou diferentes de 0
+
++ a) dependente
++ b) independente
++ c) independente
++ d) independente
++ e) dependente
+
 ### 70) Rencher e Christensen - Problema 4.17
 
 
