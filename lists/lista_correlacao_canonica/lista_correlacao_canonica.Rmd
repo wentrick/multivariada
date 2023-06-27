@@ -1,0 +1,392 @@
+---
+title: "Lista Correlação Canonica"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-06-27"
+output: 
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    highlight: tango
+    toc_depth : 4
+  html_document:
+    toc: false
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats,ACSWR,nFactors)
+diabetes_data <- read_excel("diabetes_data.xlsx")
+```
+
+### 71) Johnson e Wichern - Exercício 10.1
+
+Colocando os dados:
+```{r}
+covyy <- matrix(c(100, 0, 0, 1),2,2)
+covyx <- matrix(c( 0, .95, 0, 0), 2, 2)
+covxy <- t(covyx)
+covxx <- matrix(c(1, 0, 0, 100),2,2)
+```
+
+Visualizando a matriz completa:
+```{r}
+v1 <- cbind(covyy,covyx)
+v2 <- cbind(covxy,covxx)
+covyx <- rbind(v1,v2)
+covyx
+```
+Formula usada pelo professor para passar a matriz de covariancia para correlalção
+```{r}
+rho <- solve(diag(sqrt(diag(covyx)))) %*% covyx %*% solve(diag(sqrt(diag(covyx))))
+rho
+```
+Funcao no R que obtem o mesmo resultado:
+```{r}
+rho = cov2cor(covyx)
+rho
+```
+Criando nossas particoes da matriz de correlação
+```{r}
+rhoyy <- rho[1:2,1:2]
+rhoyx <- rho[1:2,3:4]
+rhoxy <- rho[3:4,1:2]
+rhoxx <- rho[3:4,3:4]
+```
+
+Agora precisamos encontrar nosso U, para isso vamos ter que fazer os seguintes calculos:
+
+
+$$
+\rho_{yy}^{-1/2}\rho_{yx}\rho_{xx}^{-1}\rho_{xy}\rho_{yy}^{-1/2}
+$$
+Obs: como estamos trabalhando com a matriz de correlação usamos $\rho$ se fosse de covariancia seria $\Sigma$
+
+
+$$
+U_k = A^T_k Y = e^T_k \rho_{yy}^{-1/2} Y
+$$
+onde $e_k$ é o nosso k-ésimo autovetor obtido ao aplicar o SVD no resultado da primeira formula
+
+Para calcular $\rho_{yy}^{-1/2}$ vamos usar o SVD onde iremos tirar a raiz da diagonal dos autovalores e inverter a mesma e depois reconstruir a matriz para obter o resultado desejado:
+```{r}
+rhoyysvd <- svd(rhoyy) 
+rhoyy_sqinv <- rhoyysvd$u %*% solve(diag(sqrt(rhoyysvd$d))) %*% t(rhoyysvd$v)
+```
+
+Agora calculamos $\rho_{xx}^{-1}$
+```{r}
+solve(rhoxx) 
+```
+
+Agora podemos calcular o resultado completo:
+
+```{r}
+mrhoy <- rhoyy_sqinv %*% rhoyx %*% solve(rhoxx) %*% rhoxy %*% rhoyy_sqinv
+mrhoy
+```
+
+Em seguida devemos aplicar o SVD no resultado obtido:
+```{r}
+mrhoysvd <- svd(mrhoy)
+```
+
+Vamos pegar os autovalores de $\rho$ obtidos pelo SVD
+```{r}
+rho12 <- mrhoysvd$d[1]
+
+rho22 <- mrhoysvd$d[2]
+```
+
+Em seguida vamos calcular nosso $a_1$
+```{r}
+a1 <- rhoyy_sqinv %*% mrhoysvd$u[,1]
+a1
+```
+
+
+Em seguida vamos encontrar nosso V, para isso vamos ter que fazer os seguintes calculos:
+
+
+$$
+\rho_{xx}^{-1/2}\rho_{xy}\rho_{yy}^{-1}\rho_{yx}\rho_{xx}^{-1/2}
+$$
+Obs: como estamos trabalhando com a matriz de correlação usamos $\rho$ se fosse de covariancia seria $\Sigma$
+
+
+$$
+V_k = b^T_k Y = f^T_k \rho_{xx}^{-1/2} X
+$$
+onde $f_k$ é o nosso k-ésimo autovetor obtido ao aplicar o SVD no resultado da primeira formula
+
+Para calcular $\rho_{xx}^{-1/2}$ vamos usar o SVD onde iremos tirar a raiz da diagonal dos autovalores e inverter a mesma e depois reconstruir a matriz para obter o resultado desejado:
+```{r}
+rhoxxsvd <- svd(rhoxx) 
+rhoxx_sqinv <- rhoxxsvd$u %*% solve(diag(sqrt(rhoxxsvd$d))) %*% t(rhoxxsvd$v)
+
+```
+
+Agora calculamos $\rho_{yy}^{-1}$
+```{r}
+solve(rhoyy) 
+```
+
+Agora podemos calcular o resultado completo:
+
+```{r}
+mrhox <- rhoxx_sqinv %*% rhoxy %*% solve(rhoyy) %*% rhoyx %*% rhoxx_sqinv
+mrhox
+```
+
+Em seguida devemos aplicar o SVD no resultado obtido:
+```{r}
+mrhoxsvd <- svd(mrhox)
+```
+
+Vamos pegar os autovalores de $\rho$ obtidos pelo SVD
+```{r}
+rho21 <- mrhoysvd$d[1]
+
+rho11 <- mrhoysvd$d[2]
+```
+
+Em seguida vamos calcular nosso $b_1$
+```{r}
+b1 <- rhoxx_sqinv %*% mrhoxsvd$u[,1]
+b1
+```
+
+
+Com o nosso $a_1$ e $b_1$ podemos calcular a correlação canonica:
+
+vamos obter a raiz dos autovalores obtidos, vale notar que pode ser tanto da equacao usada para encontrar $a_1$ quanto para que usamos para obter $b_1$
+```{r}
+rho1 <- sqrt(rho12) #primeiro autovalor obtido da na conta de a1
+rho2 <- sqrt(rho22) #segundo autovalor
+```
+
+
+```{r}
+rho1
+rho2
+```
+
+```{r}
+rho1 <- sqrt(rho21) #primeiro autovalor obtido na conta de b1
+rho2 <- sqrt(rho11) #segundo autovalor
+```
+
+```{r}
+rho1
+rho2
+```
+
+Agora podemos calcular nosso U e V:
+
+
+```{r}
+a1
+```
+
+
+```{r}
+b1
+```
+
+
+$$
+U = a_1^t Y
+$$
+
+$$
+V = b_1^t X
+$$
+
+Sabemos por informaçoes dadas pelo problema que $Y = [x_1,x_2]$ e $X = [x_1,x_2]$. Logo ao realizar as contas vamos obter:
+
+$$
+U = a_1^t Y = 0 \times X_1 + 1 \times X_2 = X_2
+$$
+
+
+$$
+V = b_1^t Y = 1 \times X_1 + 0 \times X_2 = X_1
+$$
+
+
+
+### 72) Johnson e Wichern - Exercício 10.2
+
+Matriz particionada:
+```{r}
+covyy <- matrix(c(8,2,2,5),2,2,byrow = TRUE)
+covyx <- matrix(c(3,1,-1,3), 2, 2,byrow = TRUE)
+covxy <- t(covyx)
+covxx <- matrix(c(6,-2,-2,7),2,2,byrow = TRUE)
+```
+
+Matriz Completa
+```{r}
+v1 <- cbind(covyy,covyx)
+v2 <- cbind(covxy,covxx)
+```
+
+
+```{r}
+covyx <- rbind(v1,v2)
+covyx
+```
+
+Covertendo para correlação:
+
+```{r}
+rho = cov2cor(covyx)
+rho
+```
+
+Criando nossas particoes da matriz de correlação
+```{r}
+rhoyy <- rho[1:2,1:2]
+rhoyx <- rho[1:2,3:4]
+rhoxy <- rho[3:4,1:2]
+rhoxx <- rho[3:4,3:4]
+```
+
+#### a)
+
+Calculo $a_1$
+```{r}
+rhoyysvd <- svd(rhoyy) 
+rhoyy_sqinv <- rhoyysvd$u %*% solve(diag(sqrt(rhoyysvd$d))) %*% t(rhoyysvd$v)
+
+mrhoy <- rhoyy_sqinv %*% rhoyx %*% solve(rhoxx) %*% rhoxy %*% rhoyy_sqinv
+mrhoysvd <- svd(mrhoy)
+rho12 <- mrhoysvd$d[1]
+
+rho22 <- mrhoysvd$d[2]
+
+a1 <- rhoyy_sqinv %*% mrhoysvd$u[,1]
+a1
+```
+
+Calculo $b_1$
+```{r}
+rhoxxsvd <- svd(rhoxx) 
+rhoxx_sqinv <- rhoxxsvd$u %*% solve(diag(sqrt(rhoxxsvd$d))) %*% t(rhoxxsvd$v)
+mrhox <- rhoxx_sqinv %*% rhoxy %*% solve(rhoyy) %*% rhoyx %*% rhoxx_sqinv
+mrhoxsvd <- svd(mrhox)
+rho21 <- mrhoysvd$d[1]
+rho11 <- mrhoysvd$d[2]
+b1 <- rhoxx_sqinv %*% mrhoxsvd$u[,1]
+b1
+```
+
+Resultado da correlação canonica
+```{r}
+rho1 <- sqrt(rho12)
+rho2 <- sqrt(rho22)
+
+rho1
+rho2
+```
+
+
+
+#### b)
+
+Vamos calcular $U_1$ e $V_1$ lembrando que a formula é:
+
+$$
+U = a_1^t Y
+$$
+
+$$
+V = b_1^t X
+$$
+Sabemos que $a_1$ e $b_1$ é:
+
+```{r}
+a1
+```
+
+```{r}
+b1
+```
+Sabemos que $Y = [x_1, x_2]$ e $X = [x_1, x_2]$. Logo ao realizar as contas vamos obter:
+
+$$
+U_1 = a_1^t Y = -0.8961 \times X_1 + 0.8099 \times X_2 
+$$
+
+
+
+$$
+V_1 = b_1^t Y = -0.8933 \times X_1 + 0.2515 \times X_2  
+$$
+Vamos calcular $U_2$ e $V_2$
+
+```{r}
+a2 <- rhoyy_sqinv %*% mrhoxsvd$u[,2]
+b2 <- rhoxx_sqinv %*% mrhoxsvd$u[,2]
+```
+
+```{r}
+a2
+```
+
+```{r}
+b2
+```
+
+$$
+U_2 = a_2^t Y = 0.2480 \times X_1 + 0.8934 \times X_2 
+$$
+
+$$
+V_2 = b_2^t Y = 0.5542 \times X_1 + 1.0207 \times X_2  
+$$
+
+#### c)
+
+
+
+
+### 73) Johnson e Wichern - Exercício 10.9 - Itens (a) e (c)
+
+
+#### a)
+
+
+#### c)
+
+
+### 74) Johnson e Wichern - Exercício 10.10
+
+
+### 75) Rencher e Christensen - Problema 11.8. (Diabetes Data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
