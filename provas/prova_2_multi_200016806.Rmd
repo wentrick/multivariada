@@ -1,0 +1,29 @@
+---
+title: "Prova 2 Multivariada"
+author: "Davi Wentrick Feijó - 200016806"
+date: "2023-06-27"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats,CCA,yacca)
+```
+
+
+### Questao 1)
+
+
+### Questao 2)
+
+
+### Questao 3)
+
+
+### Questao 4)
+
+
+
+
+
+

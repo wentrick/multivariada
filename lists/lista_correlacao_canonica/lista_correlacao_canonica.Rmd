@@ -18,7 +18,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats,ACSWR,nFactors)
+pacman::p_load(tidyverse,psych,readxl,data.table,Matrix,knitr,rmdformats,CCA,yacca)
 diabetes_data <- read_excel("diabetes_data.xlsx")
 ```
 
@@ -368,22 +368,129 @@ $$
 
 ### 75) Rencher e Christensen - Problema 11.8. (Diabetes Data)
 
+#### a)
+
+```{r}
+colnames(diabetes_data) = c("y1","y2","x1","x2","x3")
+diabetes_data = diabetes_data %>%
+  mutate(y1 = as.numeric(y1))
+```
+
+Nosso X e Y que sao os grupos que queremos ver a correlacao 
+```{r}
+Y = diabetes_data[, 1:2] ## y variables                                                                                                                                     
+X = diabetes_data[, 3:5] ## x variables
+```
+
+Calculando nossa matriz particionada
+```{r}
+totalCov = cov(diabetes_data)                                                                                                                                                
+Cyy = totalCov[1:2, 1:2]                                                                                                                                               
+Cxx = totalCov[3:5, 3:5]                                                                                                                                               
+Cyx = totalCov[1:2, 3:5]                                                                                                                                               
+Cxy = totalCov[3:5, 1:2]
+```
+
+Calculando a inversa usando o SVD
+```{r}
+Cxx_svd = svd(Cxx)
+CxxInvSq =  Cxx_svd$u %*% solve(diag(sqrt(Cxx_svd$d))) %*% t(Cxx_svd$v)   
+```
 
 
+```{r}
+Cyy_svd = svd(Cyy)
+CyyInvSq = Cyy_svd$u %*% solve(diag(sqrt(Cyy_svd$d))) %*% t(Cyy_svd$v) 
+```
+
+Com isso podemo resolver a equação e aplica o SVD no resultado tanto para X quanto para Y
+```{r}
+Cy <- CyyInvSq %*% Cyx %*% solve(Cxx) %*% Cxy %*% CyyInvSq   
+
+Cy_svd <- svd(Cy)
+```
+
+```{r}
+Cx <- CxxInvSq %*% Cxy %*% solve(Cyy) %*% Cyx %*% CxxInvSq   
+
+Cx_svd <- svd(Cx)
+```
+
+Podemos usar tanto a diagonal do SVD aplicada no Cx quanto no Cy
+```{r}
+rho12 <- Cy_svd$d[1]
+
+rho22 <- Cy_svd$d[2]
+```
 
 
+```{r}
+rho12
+rho22
+```
+Para calcular o resutlado final da correlacao devemos tirar a raiza dos autovalores encontrados:
+```{r}
+rho1 <- sqrt(rho12)
+rho2 <- sqrt(rho22)
+```
+
+```{r}
+rho1
+rho2
+```
+Algumas funçoes no R que reporuduzem a analise
+```{r}
+c1 = cancor(X, Y)  ## base R function
+c1$cor
+```
 
 
+```{r}
+c2 = cc(X, Y) ## lib CCA
+c2$cor
+```
 
 
+```{r}
+c3 = cca(X, Y) ## lib yacca
+c3$corr
+```
 
+#### b)
 
+Vamos calcular nosso $a_1$ e $b_1$
 
+```{r}
+a1 <- CyyInvSq %*% Cyy_svd$u[,1]
+a1
+```
 
+```{r}
+b1 <- CxxInvSq %*% Cxx_svd$u[,1]
+b1
+```
+Vamos calcular nossa variancia de $U_1$ e $V_1$
 
+```{r}
+VarU1 <- t(a1) %*% Cyy %*% a1
+VarV1 <- t(b1) %*% Cxx %*% b1
+```
 
+```{r}
+VarU1
+VarV1
+```
 
-
+```{r}
+matriz_var_a1 = diag(sqrt(c(totalCov[1,1],totalCov[2,2])))
+a1_padronizado = matriz_var_a1 %*% a1
+a1_padronizado
+```
+```{r}
+matriz_var_b1 = diag(sqrt(c(totalCov[3,3],totalCov[4,4],totalCov[5,5])))
+b1_padronizado = matriz_var_b1 %*% b1
+b1_padronizado
+```
 
 
 
