@@ -1,0 +1,323 @@
+---
+title: "Lista de agrupamentos"
+author: "Davi Wentrick Feijó"
+date: "2023-07-16"
+output: 
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    highlight: tango
+    toc_depth : 4
+  html_document:
+    toc: false
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(cluster,mclust,andrews,graphics,gclus)
+```
+
+
+## 76. Johnson e Wichern - Exercício 12.3. 
+
+Sabemos que o $r$ (correlacao) pode ser obtido por meio da seguinte formula:
+
+$$
+r = \frac{\sum (x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\sum (x_i-\bar{x})^2(y_i-\bar{y})^2}}
+$$
+
+Sabemos que:
+
+$$
+\bar{x} = \frac{a+b}{p} \ \ \ \ \ \ \bar{y} = \frac{a+c}{p}
+$$
+$$
+x_1 = a+b \ \ \ \ \ \ \ x_2 = b+c
+$$
+$$
+y_1 = a+c \ \ \ \ \ \ \ y_2 = b+d
+$$
+onde $p$ é o total:
+
+$$
+p = a+b+c+d
+$$
+
+Agora vamos encontrar os seguintes resultados:
+
+$$
+\sum (x_i-\bar{x})^2 = (a+b)(1-\frac{a+b}{p})^2 + (c+d)(0-\frac{a+b}{p})^2 = \frac{(a+b)+(c+d)}{p}
+$$
+$$
+\sum (x_i-\bar{x})^2 = (a+c)(1-\frac{a+c}{p})^2 + (b+d)(0-\frac{a+c}{p})^2 = \frac{(a+c)+(b+d)}{p}
+$$
+$$
+\sum (x_i-\bar{x})(y_i-\bar{y}) = \sum (x_iy_i-y_i\bar{x}-x_i\bar{y}+\bar{x}\bar{y})
+$$
+$$
+ \sum (x_iy_i-y_i\bar{x}-x_i\bar{y}+\bar{x}\bar{y}) = a + \frac{(a+c)+(a+b)}{p} - \\ \frac{(a+b)+(a+c)}{p} + p \frac{(a+b)+(a+c)}{p^2} + \\ \frac{a(a+b+c+d)-(a+c)(a+b)}{p} = \frac{ad-bc}{p}
+$$
+
+Com isso podemos chegar:
+
+$$
+r = \frac{\sum (x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\sum (x_i-\bar{x})^2(y_i-\bar{y})^2}} = \frac{\frac{ad-bc}{p}}{\sqrt{(\frac{(a+b)+(c+d)}{p})(\frac{(a+c)+(b+d)}{p})}}
+$$
+$$
+r = \frac{\frac{ad-bc}{p}}{\sqrt{(\frac{(a+b)+(c+d)}{p})(\frac{(a+c)+(b+d)}{p})}} = \frac{\frac{ad-bc}{p}}{(\frac{(a+b)+(c+d)+(a+c)+(b+d)}{p^2})}
+$$
+$$
+r = \frac{\frac{ad-bc}{p}}{(\frac{(a+b)+(c+d)+(a+c)+(b+d)}{p^2})} = \frac{ad-bc}{[(a+b)+(c+d)+(a+c)+(b+d)]^{1/2}}
+$$
+
+## 77. Johnson e Wichern - Exercício 12.5.
+
+
+```{r}
+m <- matrix(c(0 ,1,11,5,
+              1 ,0,2,3,
+              11,2,0,4,
+              5 ,3,4,0),nrow=4,byrow = T)
+
+(d <- as.dist(m))
+```
+
+### a) Ligacao Simples
+```{r}
+hcs <- hclust(d, "single")
+
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+```
+
+
+### b) Ligacao Completa
+
+
+```{r}
+hcc <- hclust(d, "complete")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Complete", main="Dendograma")
+```
+
+### c) Media
+```{r}
+hcc <- hclust(d, "average")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+```
+
+
+## 78. Johnson e Wichern - Exercício 12.6
+
+```{r}
+m <- matrix(c(0 ,4,6,1,6,
+              4 ,0,9,7,3,
+              6 ,9,0,10,5,
+              1 ,7,10,0,8,
+              6 ,3,5,8,0),nrow=5,byrow = T)
+
+(d <- as.dist(m))
+```
+
+### a) Ligacao Simples
+```{r}
+hcs <- hclust(d, "single")
+
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+```
+
+
+### b) Ligacao Completa
+
+
+```{r}
+hcc <- hclust(d, "complete")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Complete", main="Dendograma")
+```
+
+### c) Media
+```{r}
+hcc <- hclust(d, "average")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+```
+
+
+## 79. Johnson e Wichern - Exercício 12.7
+
+```{r}
+m <- matrix(c(1 ,0.63,0.51,0.12,0.16,
+              0.63 ,1,0.57,0.32,0.21,
+              0.51 ,0.57,1,0.18,0.15,
+              0.12 ,0.32,0.18,1,0.68,
+              0.16 ,0.21,0.15,0.68,1),nrow=5,byrow = T)
+
+colnames(m) <- c("JP Morgan","Citibank","Wells Fargo","Royal DutchShell","Exxon Mobil")
+rownames(m) <- c("JP Morgan","Citibank","Wells Fargo","Royal DutchShell","Exxon Mobil")
+
+
+(d <- as.dist(m))
+```
+
+### a) Ligacao Simples
+```{r}
+hcs <- hclust(d, "single")
+
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+```
+
+
+### b) Ligacao Completa
+
+
+```{r}
+hcc <- hclust(d, "complete")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Complete", main="Dendograma")
+```
+
+### c) Media
+```{r}
+hcc <- hclust(d, "average")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+```
+
+
+## 80. Johnson e Wichern - Exercício 12.11
+
+```{r}
+x1 = c(5,1,-1,3)
+x2 = c(4,-2,1,1)
+dados = data.frame(x1,x2)
+
+kc = data.frame(dados[c(1,2),])
+
+cl1 <- kmeans(dados, centers = kc)
+
+plot(dados, pch=19,cex=1)
+
+plot(dados, col = cl1$cluster)
+points(cl1$centers, col = 1:2, pch = 19, cex=2)
+```
+
+
+## 81. Johnson e Wichern - Exercício 12.12
+
+```{r}
+x1 = c(5,1,-1,3)
+x2 = c(4,-2,1,1)
+dados = data.frame(x1,x2)
+
+kc = data.frame(dados[c(1,3),])
+
+cl1 <- kmeans(dados, centers = kc)
+
+plot(dados, pch=19,cex=1)
+
+plot(dados, col = cl1$cluster)
+points(cl1$centers, col = 1:2, pch = 19, cex=2)
+```
+
+
+
+## 82. Johnson e Wichern - Exercício 12.13
+
+
+## 83. Considere o seguinte conjunto de 22 pontos (x, y).
+
+```{r}
+ponto = c(1:22)
+x = c(1,2,2,2,3,7,12,13,13,14,14,15,7,6,7,8,6,7,8,6,7,8)
+y = c(9,10,9,8,9,14,9,10,8,10,8,9,7,3,3,3,2,2,2,1,1,1)
+
+dados = data.frame(ponto,x,y)
+```
+```{r echo=FALSE}
+dados
+```
+
+
+### (a) Plote o gráfico de dispersão para o conjunto de pontos. Quantos e quais grupos você indicaria através do gráfico.
+
+```{r}
+plot(dados$x,dados$y)
+```
+### (b) Construa a matriz de distâncias D, calculando as distâncias Euclidiana, de Manhattan e Mahalanobis. Compare os resultados. Explique a razão de possíveis diferenças nos resultados para as três distâncias.
+
+```{r}
+(d1 <- dist(dados[,c(2,3)],method="euclidean",diag=F))
+(d2 <- dist(dados[,c(2,3)],method="manhattan",diag=F))
+```
+
+### (c) Utilize os algoritmos de ligação simples e média, e obtenha os respectivos dendogramas. Em cada caso indique sua escolha para o número de grupos e liste os elementos de cada grupo. Os dendogramas obtidos são únicos? Justifique.
+
+```{r}
+par(mfrow=c(1, 2))
+hcs <- hclust(d1, "single")
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+
+hcc <- hclust(d1, "average")
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+
+```
+
+```{r}
+par(mfrow=c(1, 2))
+hcs <- hclust(d2, "single")
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+
+hcc <- hclust(d2, "average")
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+
+```
+
+### (d) Descreva e aplique o algoritmo de k-means para agrupar estes dados. Apresente os
+resultados e discuta.
+
+```{r}
+cl1 <- kmeans(dados[,c(2,3)],4)
+
+plot(dados[,c(2,3)], pch=19)
+
+plot(dados[,c(2,3)], col = cl1$cluster)
+
+```
+
+## 84. Seis variáveis são medidas de 100 notas genuínas e 100 notas falsificadas (Flury and Riedwyl, 1988.)
+
+```{r echo=FALSE}
+data(bank)
+head(bank)
+```
+
+
+### (a) Calcule as médias de cada variável em cada população (notas verdadeiras e falsificadas). Obtenha também a matriz de variância-covariâncias Σ em cada população. Obtenha um face plot de cada população utilizando os valores médios. Compare os resultados númericos com os gráficos. Discuta. Utilize o face plot para comparar os valores médios das variáveis para notas verdadeiras e notas falsas. Discuta os resultados. 
+
+### (b) Utilize um método de agrupamento para verificar se é possível distiguir as notas falsas das verdadeiras, imaginando que você não soubesse se 100 últimas notas eram verdadeiras.
+
+### (c) Compare os resultados do agrupamento anterior com o agrupamento por mistura de normais
+
+### (d) Utilize o Índice Ajustado de Rand para comparar seu agrupamento das 200 notas com a verdadeira classificação em genuínas e falsas. Avalie a qualidade do agrupamento.
+
+
+
+
