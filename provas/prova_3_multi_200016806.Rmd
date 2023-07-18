@@ -1,0 +1,899 @@
+---
+title: "Prova 3 Multivariada"
+author: "Davi Wentrick Feijó"
+date: "2023-07-18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(readxl,tidyverse,cluster,mclust,andrews,graphics,gclus,biotools,knitr,tidyverse,aplpack,gridExtra,factoextra,cluster,
+               biotools,effectsize,DescTools,mda,mvnTest,caTools,tidyverse,readxl,MASS,klaR,ggplot2,knitr,cowplot,Rchoice,AICcmodavg,questionr,mdscore,nlme)
+```
+
+## 79. Johnson e Wichern - Exercício 12.7
+
+```{r echo=FALSE}
+m <- matrix(c(1 ,0.63,0.51,0.12,0.16,
+              0.63 ,1,0.57,0.32,0.21,
+              0.51 ,0.57,1,0.18,0.15,
+              0.12 ,0.32,0.18,1,0.68,
+              0.16 ,0.21,0.15,0.68,1),nrow=5,byrow = T)
+
+colnames(m) <- c("JP Morgan","Citibank","Wells Fargo","Royal DutchShell","Exxon Mobil")
+rownames(m) <- c("JP Morgan","Citibank","Wells Fargo","Royal DutchShell","Exxon Mobil")
+
+
+(d <- as.dist(m))
+```
+```{r echo=FALSE}
+par(mfrow=c(1, 3))
+hcs <- hclust(d, "single")
+
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Dendograma")
+hcc <- hclust(d, "complete")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Complete", main="Dendograma")
+
+hcc <- hclust(d, "average")
+
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Dendograma")
+```
+Podemos observar que os agrupamentos por ligacao simples e pela media tem um comportamento parecido, se diferenciando na distancia para o corte. Já o por ligacao completa agrupa os elementos de forma diferente das do demais.
+
+
+## 81. Johnson e Wichern - Exercício 12.12
+
+```{r echo=FALSE}
+x1 <- c(5,-1,1,-3)
+x2 <- c(3,1,-2,-2)
+dados = data.frame(x1,x2)
+
+centroAC = dados[c(1,3),] %>%
+  summarise_all(list(mean))
+
+centroBD = dados[c(2,4),] %>%
+  summarise_all(list(mean))
+
+kc = data.frame(rbind(centroAC,centroBD))
+
+cl1 <- kmeans(dados, centers = kc)
+
+par(mfrow=c(1, 2))
+plot(dados, pch=19,cex=1,main="Grafico de dispersao")
+
+plot(dados, col = cl1$cluster,main="K-means")
+
+points(cl1$centers, col = 1:2, pch = 19, cex=2)
+```
+
+\newpage
+
+## 83. Considere o seguinte conjunto de 22 pontos (x, y).
+
+```{r echo=FALSE}
+ponto = c(1:22)
+x = c(1,2,2,2,3,7,12,13,13,14,14,15,7,6,7,8,6,7,8,6,7,8)
+y = c(9,10,9,8,9,14,9,10,8,10,8,9,7,3,3,3,2,2,2,1,1,1)
+
+dados = data.frame(ponto,x,y)
+```
+
+```{r echo=FALSE}
+dados
+```
+
+
+### (a) Plote o gráfico de dispersão para o conjunto de pontos. Quantos e quais grupos você indicaria através do gráfico.
+
+```{r echo=FALSE}
+plot(dados$x,dados$y)
+```
+Ao observar pelo gráfico é indicado claramente 3 grandes grupos e mais um ou dois grupos de uma unica observacao que seriam aqueles no meio.
+
+### (b) Construa a matriz de distâncias D, calculando as distâncias Euclidiana, de Manhattan e Mahalanobis. Compare os resultados. Explique a razão de possíveis diferenças nos resultados para as três distâncias.
+
+Distancia Euclidiana
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+d1 <- dist(dados[,c(2,3)],method="euclidean",diag=F)
+```
+
+```{r echo=FALSE}
+d1
+```
+
+Distancia de Manhattan
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+d2 <- dist(dados[,c(2,3)],method="manhattan",diag=F)
+```
+
+```{r echo=FALSE}
+d2
+```
+
+O que pode causar diferenca na forma de agrupamento por essas distancias é que uma usa a distancia euclidiana que temuma formual diferente da de manhattam que usa valores absolutos, ou seja, é esperado agrupamentos diferentes.
+
+### (c) Utilize os algoritmos de ligação simples e média, e obtenha os respectivos dendogramas. Em cada caso indique sua escolha para o número de grupos e liste os elementos de cada grupo. Os dendogramas obtidos são únicos? Justifique.
+
+```{r echo=FALSE}
+par(mfrow=c(1, 2))
+hcs <- hclust(d1, "single")
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Distancias 1 Euclidiana")
+
+hcc <- hclust(d1, "average")
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Distancias 2 Euclidiana")
+
+```
+Assim como discutido antes, as diferentes medidas de distancia trazem consigo agrupamentos diferentes.
+
+```{r echo=FALSE}
+par(mfrow=c(1, 2))
+hcs <- hclust(d2, "single")
+plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Single", main="Distancias 1 Manhattan")
+
+hcc <- hclust(d2, "average")
+plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
+     xlab="Average", main="Distancias 2 Manhattan")
+
+```
+O mesmo pode ser observado aqui
+
+
+### (d) Descreva e aplique o algoritmo de k-means para agrupar estes dados. Apresente os
+resultados e discuta.
+
+```{r echo=FALSE}
+par(mfrow=c(1, 2))
+cl1 <- kmeans(dados[,c(2,3)],4)
+
+plot(dados[,c(2,3)], pch=19, main = "Grafico de Dispersao")
+
+plot(dados[,c(2,3)], col = cl1$cluster, main="K-means")
+
+```
+Podemos perceber que o k-means obteve um resultado muito bom, porem nao perfeito. Identificando 4 grupos porem nao contendo os elementos esperados de cada um. no caso o ponto do meio seria mais correto estar agrupado sozinho ou com o outro valor extremo.
+
+## 84. Seis variáveis são medidas de 100 notas genuínas e 100 notas falsificadas (Flury and Riedwyl, 1988.)
+
+```{r echo=FALSE}
+data(bank)
+head(bank)
+```
+
+### (a) Calcule as médias de cada variável em cada população (notas verdadeiras e falsificadas). Obtenha também a matriz de variância-covariâncias $\Sigma$ em cada população. Obtenha um face plot de cada população utilizando os valores médios. Compare os resultados númericos com os gráficos. Discuta. Utilize o face plot para comparar os valores médios das variáveis para notas verdadeiras e notas falsas. Discuta os resultados. 
+
+```{r echo=FALSE, fig.align='center', message=FALSE, warning=FALSE}
+bank$Status <- factor(bank$Status)
+
+mu <- bank %>%
+  group_by(Status) %>%
+  summarise_all(list(mean)) %>%
+  dplyr::select(!Status)
+
+faces(mu)
+```
+
+\newpage
+
+Medidas resumo das notas verdadeiras
+```{r echo=FALSE}
+summary(bank[bank$Status == 0,])
+```
+Medidas resumo das notas falsas
+
+```{r echo=FALSE}
+summary(bank[bank$Status == 1,])
+```
+
+Podemos perceber pelo face plot que os 2 grupos tem caracteristicas bem diferentes em especial nas variaveis, Bottom, Top e Diagonal, que no faceplot sao responsaveis pelo cabelo do personagem. Levando me consideracao as medidas resumo podemos ver que tem uma diferenca grande entre os grupos na escala de uma nota de dinheiro
+
+### (b) Utilize um método de agrupamento para verificar se é possível distiguir as notas falsas das verdadeiras, imaginando que você não soubesse se 100 últimas notas eram verdadeiras.
+
+```{r echo=FALSE}
+cl1 <- kmeans(bank,2)
+
+plot(bank$Diagonal, bank$Bottom, pch=19)
+plot(bank$Diagonal, bank$Top, pch=19)
+plot(bank$Diagonal, bank$Right, pch=19)
+```
+Podemos notar pelos graficos selecionados que a diagonal da nota parece agrupar bem as observacoes em relacao as outras variaveis.
+
+```{r echo=FALSE}
+plot(bank[,c(6,7)], col = cl1$cluster, main = "K-means")
+```
+
+Podemos perceber que esta bem dividido com apenas uma observacao ficando agrupada no cluster errado
+
+### (c) Compare os resultados do agrupamento anterior com o agrupamento por mistura de normais
+
+```{r echo=FALSE}
+n <- length(bank[,1])
+bank_den <- densityMclust(bank[,c(6,7)], model="EII", G = 2)
+```
+
+O modelo utilizado foi o EII para agrupar os dados
+
+### (d) Utilize o Índice Ajustado de Rand para comparar seu agrupamento das 200 notas com a verdadeira classificação em genuínas e falsas. Avalie a qualidade do agrupamento.
+
+Comparando os resultados do k-mean com a verdadeira calssificacao 
+```{r echo=FALSE}
+adjustedRandIndex(cl1$cluster,bank$Status)
+```
+
+Comparando os resultados da mistura de normais com a verdadeira calssificacao 
+```{r echo=FALSE}
+adjustedRandIndex(cl1$cluster,bank_den$classification)
+```
+
+Podemos perceber que o K-means agrupou todos muito bem mostrando um desempenho melhor que a mistura de normais, que ainda sim deu um bom resultado
+
+## 89. Johnson e Wichern - Exercício 11.24. - Dados: T11-4-BankruptcyData.dat.
+
+```{r echo=FALSE}
+BankruptcyData <- read_excel("BankruptcyData.xlsx")%>%
+  mutate(x1 = as.numeric(x1),
+         x2 = as.numeric(x2),
+         x3 = as.numeric(x3),
+         x4 = as.numeric(x4),
+         x5 = as.factor(x5))
+
+```
+
+### a)
+
+```{r echo=FALSE}
+#par(mfrow=c(3, 1))
+plot(BankruptcyData$x1,BankruptcyData$x2, col = BankruptcyData$x5)
+plot(BankruptcyData$x1,BankruptcyData$x3, col = BankruptcyData$x5)
+plot(BankruptcyData$x1,BankruptcyData$x4, col = BankruptcyData$x5)
+```
+
+### b)
+
+```{r echo=FALSE}
+dados_falido = BankruptcyData %>%
+  filter(x5 == 1)
+
+dados_ativo = BankruptcyData %>%
+  filter(x5 == 0)
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x2))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x2))
+
+s1 = round(cov(dados_ativo[,c(1,2)]),5)
+
+s2 = round(cov(dados_falido[,c(1,2)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+Temos matrizes de covariancia diferente entre as populacoes.
+
+### c)
+
+```{r echo=FALSE}
+dados <- BankruptcyData
+gqda <- qda(x5~x1+x2, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2, data = dados,prior =c(.5,.5),CV=T)
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+```
+Com um calssificardo quadratico obtivemos um bom desempenho com 80% de acerto
+
+### d)
+
+```{r echo=FALSE}
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Nosso erro aparente foi de 20% como esperado pelo resultado anterior
+
+### e)
+
+```{r echo=FALSE}
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Quando mudamos as priores nos conseguimos acertar todos do grupo 1 porem erramos mais da metade do grupo 2 
+
+### f)
+
+```{r echo=FALSE}
+cov_pooled_inv = solve(cov_pooled(dados_ativo[,c(1,2)],dados_falido[,c(1,2)]))
+
+a <- t(x1_barra - x2_barra) %*% cov_pooled_inv
+m <- 0.5*(a %*% x1_barra+ a %*% x2_barra)
+
+pop <- BankruptcyData %>%
+  rowwise() %>%
+  mutate(M = a %*% c(x1, x2)) %>%
+  mutate(pop = ifelse(M > m,0,1)) 
+  
+matriz = pop %>%
+  group_by(x5,pop) %>%
+  summarise(freq = n())
+matriz
+
+```
+
+```{r echo=FALSE}
+cat("erro aparente (APER) deste conjunto foi:",9/46)
+```
+Usando o classificador de fisher que assume matrizes de covariancia iguais entre as duas populacoes, o que nao é o caso, obteve umm desempenho melhor que o da funcao quadratica apesar de nao ser indicado para situacoes como essa.
+
+
+### g)
+
+#### Analise com $X_1$ e $X_3$
+```{r echo=FALSE}
+# x1,x3
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x3))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x3))
+
+s1 = round(cov(dados_ativo[,c(1,3)]),5)
+
+s2 = round(cov(dados_falido[,c(1,3)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+Novamente matriz de covariancia diferentes
+
+Usando a priori $0.5|0.5$
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x3, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x3, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Usando a o $X_3$ no lugar do $X_2$ ajudou na melhora do classificador, errando apenas 10% neste conjunto de dados
+
+
+Usando a priori $0.05|0.95$
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x3, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x3, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+Ao mudar a priori temos um desempenho pior do que quando usamos $X_2$, ele continua acertando todos do grupo 1 porem errando mais do grupo 2.
+
+#### Analise com $X_1$ e $X_4$
+```{r echo=FALSE}
+# x1,x4
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x4))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x4))
+
+s1 = round(cov(dados_ativo[,c(1,4)]),5)
+
+s2 = round(cov(dados_falido[,c(1,4)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+As matrizes estao mais parecidas em alguns lugares porem ainda sao diferentes
+
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x4, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x4, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Usando $X_4$ obtivemos um bom desempenho, errando somente 17% neste conjunto de dados, o que é um bom resultado
+
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x4, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x4, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Assim como nos outros resultados, temos um desempnho geral ruim, porem acertando tudo do grupo 1
+
+### h)
+
+```{r echo=FALSE}
+# x1,x4
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x4))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x4))
+
+s1 = round(cov(dados_ativo[,c(1:4)]),5)
+
+s2 = round(cov(dados_falido[,c(1:4)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+Novamente matrizes diferentes!
+
+Usando a priori $0.5|0.5$
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Usando todas as variaveis disponiveis, temos um classificador ainda melhor errando somente 6% neste conjunto de dados
+
+Usando a priori $0.05|0.95$
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+Usando todas as variaveis disponiveis, temos um classificador ainda melhor e mesmo com a priori tendendo forte para um grupo, conseguimos minimizar os erros em relacao aos classificadores anteriores
+
+## 90. Johnson e Wichern - Exercício 11.32. - Dados: T11-8-Hemofilia.dat.
+
+```{r echo=FALSE}
+Hemofilia <- read_excel("Hemofilia.xlsx") %>%
+  mutate(x1 = as.factor(x1),
+         x2 = as.numeric(x2),
+         x3 = as.numeric(x3))
+```
+
+
+### a)
+```{r echo=FALSE}
+plot(Hemofilia$x2,Hemofilia$x3, col=Hemofilia$x1)
+```
+
+### b)
+
+```{r echo=FALSE}
+hemo_1 = Hemofilia %>%
+  filter(x1 == 1)
+
+hemo_2 = Hemofilia %>%
+  filter(x1 == 2)
+
+x1_barra = c(mean(hemo_1$x2),mean(hemo_1$x3))
+
+x2_barra = c(mean(hemo_2$x2),mean(hemo_2$x3))
+
+s1 = cov(hemo_1[,c(2,3)])
+
+s2 = cov(hemo_2[,c(2,3)])
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias do grupo 1:",x1_barra)
+cat("Vetor de medias dos grupo 2:",x2_barra)
+cat("Covariancia do grupo 1")
+s1
+cat("Covariancia do grupo 2")
+s2
+```
+
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+glda <- lda(x1~x2+x3, data = Hemofilia,prior =c(.5,.5))
+
+gldp1 <- predict(glda)
+glctable1 <- table(Hemofilia$x1, gldp1$class)
+
+# Com validação cruzada
+gldaVC <- lda(x1~x2+x3, data = Hemofilia,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(Hemofilia$x1, gldp1$class) 
+MCV <- table(Hemofilia$x1, gldaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+Validacao Holdout
+
+Para essa passo o banco de dados foi semaprado em 2 cada um com metade das observacoes e foi rodado um classificador linear no banco de treinamento e depois foi aplicado no de teste.
+
+```{r echo=FALSE}
+set.seed(123)
+split <- sample.split(Hemofilia$x1, SplitRatio = 0.5) 
+train <- subset(Hemofilia, split==T)
+test <- subset(Hemofilia, split==F)
+
+lda_train <- lda(x1~x2+x3, data = train,prior =c(.5,.5))
+
+PT <- predict(lda_train, newdata = test, type = "response")
+glctable <- table(test$x1, PT$x >= 0.5)
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+glctable
+cat("Acerto de classificacao por grupo",(diag(prop.table(glctable,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(glctable)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+Obtemos um classificador bom, com apenas 14% de taxa de erro!
+
+### c)
+
+```{r echo=FALSE}
+df <- read_table("tabela12.32c.txt", 
+                    col_names = FALSE)
+colnames(df) <- c("x2","x3")
+df$X1 <- NA
+```
+
+
+```{r echo=FALSE}
+pred = predict(lda_train, newdata = df, type = "response")
+pred
+```
+Todas as observacoes foram para o grupo 1 de acordo com nosso classificador 
+
+### d)
+
+Nessa questao a unica coisa que foi mudada era as probabilidades a priori, o resto ficou igual!
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+glda <- lda(x1~x2+x3, data = Hemofilia,prior =c(.75,.25))
+
+gldp1 <- predict(glda)
+glctable1 <- table(Hemofilia$x1, gldp1$class)
+
+# Com validação cruzada
+gldaVC <- lda(x1~x2+x3, data = Hemofilia,prior =c(.75,.25),CV=T)
+
+# Matrizes de confusão:
+M <- table(Hemofilia$x1, gldp1$class) 
+MCV <- table(Hemofilia$x1, gldaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+set.seed(123)
+split <- sample.split(Hemofilia$x1, SplitRatio = 0.5) 
+train <- subset(Hemofilia, split==T)
+test <- subset(Hemofilia, split==F)
+
+lda_train <- lda(x1~x2+x3, data = train,prior =c(.75,.25))
+
+PT <- predict(lda_train, newdata = test, type = "response")
+glctable <- table(test$x1, PT$x >= 0.75)
+
+# APER e \hat{E}APR:
+APER <- (sum(glctable)-sum(diag(glctable)))/sum(glctable) # APER x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+glctable
+cat("Acerto de classificacao por grupo",(diag(prop.table(glctable,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(glctable)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+```
+Obtemos um modelo com uma taxa de erro de 23%
+
+```{r echo=FALSE}
+pred = predict(lda_train, newdata = df, type = "response")
+pred
+```
+
+Novamente todas as novas observacoes vao para o mesmo grupo 1
+
+## 91. Considere os dados sobre falsificação de notas do Exercício 84. Realize as análises Linear e Quadrática de discriminantes. É possível utilizar mistura de normais (função `mclust`) como análise de discriminantes? Se sim, faça o estudo e compare as estimativas APER para as três situações. Resuma os resultados e conclusões.
+
+Usando um discriminante linear 
+```{r echo=FALSE}
+# Discriminante linear
+data(bank)
+bank$Status <- factor(bank$Status)
+
+LDA <- lda(Status~., data = bank,prior=c(.5,.5))
+LDA_pred <- predict(LDA)
+LDA_tabela <- table(bank$Status, LDA_pred$class)
+prop_grupo <- (diag(prop.table(LDA_tabela,1))) # prop de classif. correta no grupo
+prop_total <- (sum(diag(prop.table(LDA_tabela)))) # prop total de classf. correta 
+
+# Matrizes de confusão:
+M <- table(bank$Status, LDA_pred$class) 
+
+# APER:
+APER <- (sum(M)-sum(diag(M)))/sum(M)
+
+#partimat(Status ~ ., data = bank, method = "lda")
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+M
+cat("Acerto de classificacao por grupo",prop_grupo)
+cat("Porporcao total de acerto",prop_total)
+cat("erro aparente (APER) deste conjunto foi:",APER)
+```
+Nosso discriminante obteve um erro de apenas 0.005 ou seja errou somente uma classificacao 
+
+```{r echo=FALSE}
+# Discriminante quadrático
+Qda <- qda(Status~., data = bank,prior=c(.5,.5))
+QDA_pred <- predict(Qda)
+QDA_tabela <- table(bank$Status, QDA_pred$class)
+prop_group <- (diag(prop.table(QDA_tabela,1))) # prop de classif. correta no grupo
+prop_total <- (sum(diag(prop.table(QDA_tabela)))) # prop total de classf. correta 
+
+# Matrizes de confusão:
+M <- table(bank$Status, QDA_pred$class) 
+
+# APER:
+APER <- (sum(M)-sum(diag(M)))/sum(M)
+
+#partimat(Status ~ ., data = bank, method = "qda")
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+M
+cat("Acerto de classificacao por grupo",prop_grupo)
+cat("Porporcao total de acerto",prop_total)
+cat("erro aparente (APER) deste conjunto foi:",APER)
+```
+
+Usando o mclust podemos rodar discriminantes por mistura de normais, ao usar a funcao `mclustBIC()` pode geerar um gráfico com diferentes discriminantes de misturas de normais e a quantidade de grupos que ele indica ter.
+```{r echo=FALSE}
+# Análise de discriminantes por mistura de normais (mclust)
+
+Class <- factor(bank$Status, levels = 0:1,
+                labels = c("Genuína", "Falsificada"))
+
+X <- data.matrix(bank[,-1])
+
+mod <- Mclust(X)
+summary(mod$BIC)
+
+plot(mclustBIC(X))
+
+summary(mod)
+table(Class, mod$classification)    # por algum motivo este não renderiza
+RAND <- adjustedRandIndex(Class, mod$classification)
+
+# Matrizes de confusão:
+M <- table(bank$Status, mod$class) 
+
+# APER:
+APER <- (2+16)/(2+98+16+84)
+```
+```{r}
+cat("Matriz de confusao")
+M
+cat("Index de Rand",RAND)
+cat("erro aparente (APER) deste conjunto foi:",APER)
+```
+
+
+
+
+
+
+

@@ -85,33 +85,27 @@ m <- matrix(c(0 ,1,11,5,
 
 (d <- as.dist(m))
 ```
-
-### a) Ligacao Simples
 ```{r}
+par(mfrow=c(1, 3))
 hcs <- hclust(d, "single")
 
 plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Single", main="Dendograma")
-```
-
-
-### b) Ligacao Completa
-
-
-```{r}
 hcc <- hclust(d, "complete")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Complete", main="Dendograma")
-```
 
-### c) Media
-```{r}
 hcc <- hclust(d, "average")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Average", main="Dendograma")
 ```
+
+
+
+
+
 
 
 ## 78. Johnson e Wichern - Exercício 12.6
@@ -125,28 +119,17 @@ m <- matrix(c(0 ,4,6,1,6,
 
 (d <- as.dist(m))
 ```
-
-### a) Ligacao Simples
 ```{r}
+par(mfrow=c(1, 3))
 hcs <- hclust(d, "single")
 
 plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Single", main="Dendograma")
-```
-
-
-### b) Ligacao Completa
-
-
-```{r}
 hcc <- hclust(d, "complete")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Complete", main="Dendograma")
-```
 
-### c) Media
-```{r}
 hcc <- hclust(d, "average")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
@@ -169,33 +152,25 @@ rownames(m) <- c("JP Morgan","Citibank","Wells Fargo","Royal DutchShell","Exxon 
 
 (d <- as.dist(m))
 ```
-
-### a) Ligacao Simples
 ```{r}
+par(mfrow=c(1, 3))
 hcs <- hclust(d, "single")
 
 plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Single", main="Dendograma")
-```
-
-
-### b) Ligacao Completa
-
-
-```{r}
 hcc <- hclust(d, "complete")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Complete", main="Dendograma")
-```
 
-### c) Media
-```{r}
 hcc <- hclust(d, "average")
 
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
      xlab="Average", main="Dendograma")
 ```
+
+
+
 
 
 ## 80. Johnson e Wichern - Exercício 12.11
@@ -209,9 +184,11 @@ kc = data.frame(dados[c(1,2),])
 
 cl1 <- kmeans(dados, centers = kc)
 
-plot(dados, pch=19,cex=1)
+par(mfrow=c(1, 2))
+plot(dados, pch=19,cex=1,main="Grafico de dispersao")
 
-plot(dados, col = cl1$cluster)
+plot(dados, col = cl1$cluster,main="K-means")
+
 points(cl1$centers, col = 1:2, pch = 19, cex=2)
 ```
 
@@ -223,19 +200,47 @@ x1 = c(5,1,-1,3)
 x2 = c(4,-2,1,1)
 dados = data.frame(x1,x2)
 
-kc = data.frame(dados[c(1,3),])
+centroAC = dados[c(1,3),] %>%
+  summarise_all(list(mean))
+
+centroBD = dados[c(2,4),] %>%
+  summarise_all(list(mean))
+
+kc = data.frame(rbind(centroAC,centroBD))
 
 cl1 <- kmeans(dados, centers = kc)
 
-plot(dados, pch=19,cex=1)
+par(mfrow=c(1, 2))
+plot(dados, pch=19,cex=1,main="Grafico de dispersao")
 
-plot(dados, col = cl1$cluster)
+plot(dados, col = cl1$cluster,main="K-means")
+
 points(cl1$centers, col = 1:2, pch = 19, cex=2)
 ```
 
 
 
 ## 82. Johnson e Wichern - Exercício 12.13
+
+```{r}
+centroAC = dados[c(3,4),] %>%
+  summarise_all(list(mean))
+
+centroBD = dados[c(1,2),] %>%
+  summarise_all(list(mean))
+
+kc = data.frame(rbind(centroAC,centroBD))
+
+cl1 <- kmeans(dados, centers = kc)
+
+par(mfrow=c(1, 2))
+plot(dados, pch=19,cex=1,main="Grafico de dispersao")
+
+plot(dados, col = cl1$cluster,main="K-means")
+
+points(cl1$centers, col = 1:2, pch = 19, cex=2)
+```
+
 
 
 ## 83. Considere o seguinte conjunto de 22 pontos (x, y).
@@ -270,11 +275,11 @@ plot(dados$x,dados$y)
 par(mfrow=c(1, 2))
 hcs <- hclust(d1, "single")
 plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
-     xlab="Single", main="Dendograma")
+     xlab="Single", main="Distancias 1 Euclidiana")
 
 hcc <- hclust(d1, "average")
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
-     xlab="Average", main="Dendograma")
+     xlab="Average", main="Distancias 2 Euclidiana")
 
 ```
 
@@ -282,11 +287,11 @@ plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5,
 par(mfrow=c(1, 2))
 hcs <- hclust(d2, "single")
 plot(hcs, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
-     xlab="Single", main="Dendograma")
+     xlab="Single", main="Distancias 1 Manhattan")
 
 hcc <- hclust(d2, "average")
 plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5, 
-     xlab="Average", main="Dendograma")
+     xlab="Average", main="Distancias 2 Manhattan")
 
 ```
 
@@ -294,11 +299,12 @@ plot(hcc, hang = -1, cex.axis=1.2, cex.lab = 1.5,
 resultados e discuta.
 
 ```{r}
+par(mfrow=c(1, 2))
 cl1 <- kmeans(dados[,c(2,3)],4)
 
-plot(dados[,c(2,3)], pch=19)
+plot(dados[,c(2,3)], pch=19, main = "Grafico de Dispersao")
 
-plot(dados[,c(2,3)], col = cl1$cluster)
+plot(dados[,c(2,3)], col = cl1$cluster, main="K-means")
 
 ```
 
