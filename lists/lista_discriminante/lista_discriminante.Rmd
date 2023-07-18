@@ -18,7 +18,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(tidyverse,MASS,klaR,ggplot2,knitr,cowplot,Rchoice,AICcmodavg,questionr,mdscore,nlme)
+pacman::p_load(tidyverse,readxl,MASS,klaR,ggplot2,knitr,cowplot,Rchoice,AICcmodavg,questionr,mdscore,nlme,effectsize,DescTools,mda,mvnTest,gclus,mclust,caTools)
 ```
 
 
@@ -240,8 +240,617 @@ Como -0.53 é maior que -0.25 alocamos essa observacao para $\pi_2$
 
 ## 89. Johnson e Wichern - Exercício 11.24. - Dados: T11-4-BankruptcyData.dat.
 
+```{r echo=FALSE}
+BankruptcyData <- read_excel("BankruptcyData.xlsx")%>%
+  mutate(x1 = as.numeric(x1),
+         x2 = as.numeric(x2),
+         x3 = as.numeric(x3),
+         x4 = as.numeric(x4))
+
+```
+
+### a)
+
+```{r echo=FALSE}
+#par(mfrow=c(3, 1))
+plot(BankruptcyData$x1,BankruptcyData$x2)
+plot(BankruptcyData$x1,BankruptcyData$x3)
+plot(BankruptcyData$x1,BankruptcyData$x4)
+```
+
+
+
+### b)
+
+```{r echo=FALSE}
+dados_falido = BankruptcyData %>%
+  filter(x5 == 1)
+
+dados_ativo = BankruptcyData %>%
+  filter(x5 == 0)
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x2))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x2))
+
+s1 = round(cov(dados_ativo[,c(1,2)]),5)
+
+s2 = round(cov(dados_falido[,c(1,2)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+
+### c)
+
+```{r}
+dados <- BankruptcyData
+gqda <- qda(x5~x1+x2, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2, data = dados,prior =c(.5,.5),CV=T)
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+```
+
+### d)
+
+```{r}
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+
+### e)
+
+```{r}
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+
+### f)
+
+```{r}
+cov_pooled_inv = solve(cov_pooled(dados_ativo[,c(1,2)],dados_falido[,c(1,2)]))
+
+a <- t(x1_barra - x2_barra) %*% cov_pooled_inv
+m <- 0.5*(a %*% x1_barra+ a %*% x2_barra)
+
+pop <- BankruptcyData %>%
+  rowwise() %>%
+  mutate(M = a %*% c(x1, x2)) %>%
+  mutate(pop = ifelse(M > m,0,1)) 
+  
+matriz = pop %>%
+  group_by(x5,pop) %>%
+  summarise(freq = n())
+matriz
+
+```
+
+```{r echo=FALSE}
+cat("erro aparente (APER) deste conjunto foi:",9/46)
+```
+
+### g)
+
+#### Analise com $X_1$ e $X_3$
+```{r echo=FALSE}
+# x1,x3
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x3))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x3))
+
+s1 = round(cov(dados_ativo[,c(1,3)]),5)
+
+s2 = round(cov(dados_falido[,c(1,3)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+
+Usando a priori $0.5|0.5$
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x3, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x3, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+Usando a priori $0.05|0.95$
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x3, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x3, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+#### Analise com $X_1$ e $X_4$
+```{r echo=FALSE}
+# x1,x4
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x4))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x4))
+
+s1 = round(cov(dados_ativo[,c(1,4)]),5)
+
+s2 = round(cov(dados_falido[,c(1,4)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x4, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x4, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x4, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x4, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+
+### h)
+
+```{r echo=FALSE}
+# x1,x4
+
+x1_barra = c(mean(dados_ativo$x1),mean(dados_ativo$x4))
+
+x2_barra = c(mean(dados_falido$x1),mean(dados_falido$x4))
+
+s1 = round(cov(dados_ativo[,c(1:4)]),5)
+
+s2 = round(cov(dados_falido[,c(1:4)]),5)
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias dos ativos:",x1_barra)
+cat("Vetor de medias dos falidos:",x2_barra)
+cat("Covariancia dos ativos")
+s1
+cat("Covariancia dos falidos")
+s2
+```
+
+Usando a priori $0.5|0.5$
+```{r echo=FALSE}
+#analise com 0.5\0.5
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.5,.5))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+Usando a priori $0.05|0.95$
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+gqda <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.05,.95))
+
+gqdap1 <- predict(gqda)
+gqctable1 <- table(dados$x5, gqdap1$class)
+
+# Com validação cruzada
+gqdaVC <- qda(x5~x1+x2+x3+x4, data = dados,prior =c(.05,.95),CV=T)
+
+# Matrizes de confusão:
+M <- table(dados$x5, gqdap1$class) 
+MCV <- table(dados$x5, gqdaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+gqctable1
+cat("Acerto de classificacao por grupo",(diag(prop.table(gqctable1,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(gqctable1)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
 
 ## 90. Johnson e Wichern - Exercício 11.32. - Dados: T11-8-Hemofilia.dat.
 
+```{r}
+Hemofilia <- read_excel("Hemofilia.xlsx") %>%
+  mutate(x1 = as.factor(x1),
+         x2 = as.numeric(x2),
+         x3 = as.numeric(x3))
+```
+
+
+### a)
+```{r}
+plot(Hemofilia$x2,Hemofilia$x3, col=Hemofilia$x1)
+```
+
+### b)
+
+```{r echo=FALSE}
+hemo_1 = Hemofilia %>%
+  filter(x1 == 1)
+
+hemo_2 = Hemofilia %>%
+  filter(x1 == 2)
+
+x1_barra = c(mean(hemo_1$x2),mean(hemo_1$x3))
+
+x2_barra = c(mean(hemo_2$x2),mean(hemo_2$x3))
+
+s1 = cov(hemo_1[,c(2,3)])
+
+s2 = cov(hemo_2[,c(2,3)])
+```
+
+```{r echo=FALSE}
+cat("Vetor de medias do grupo 1:",x1_barra)
+cat("Vetor de medias dos grupo 2:",x2_barra)
+cat("Covariancia do grupo 1")
+s1
+cat("Covariancia do grupo 2")
+s2
+```
+
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+glda <- lda(x1~x2+x3, data = Hemofilia,prior =c(.5,.5))
+
+gldp1 <- predict(glda)
+glctable1 <- table(Hemofilia$x1, gldp1$class)
+
+# Com validação cruzada
+gldaVC <- lda(x1~x2+x3, data = Hemofilia,prior =c(.5,.5),CV=T)
+
+# Matrizes de confusão:
+M <- table(Hemofilia$x1, gldp1$class) 
+MCV <- table(Hemofilia$x1, gldaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+Validacao Holdout
+
+```{r}
+set.seed(123)
+split <- sample.split(Hemofilia$x1, SplitRatio = 0.5) 
+train <- subset(Hemofilia, split==T)
+test <- subset(Hemofilia, split==F)
+
+lda_train <- lda(x1~x2+x3, data = train,prior =c(.5,.5))
+
+PT <- predict(lda_train, newdata = test, type = "response")
+glctable <- table(test$x1, PT$x >= 0.5)
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+glctable
+cat("Acerto de classificacao por grupo",(diag(prop.table(glctable,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(glctable)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+### c)
+
+```{r}
+df <- read_table("tabela12.32c.txt", 
+                    col_names = FALSE)
+colnames(df) <- c("x2","x3")
+df$X1 <- NA
+```
+
+
+```{r}
+pred = predict(lda_train, newdata = df, type = "response")
+pred
+```
+Todas as observacoes foram para o grupo 1 
+
+### D)
+
+```{r echo=FALSE}
+#analise com 0.05\0.95
+
+#dados <- dados[,-6]
+glda <- lda(x1~x2+x3, data = Hemofilia,prior =c(.75,.25))
+
+gldp1 <- predict(glda)
+glctable1 <- table(Hemofilia$x1, gldp1$class)
+
+# Com validação cruzada
+gldaVC <- lda(x1~x2+x3, data = Hemofilia,prior =c(.75,.25),CV=T)
+
+# Matrizes de confusão:
+M <- table(Hemofilia$x1, gldp1$class) 
+MCV <- table(Hemofilia$x1, gldaVC$class) 
+
+# APER e \hat{E}APR:
+APER <- (sum(M)-sum(diag(M)))/sum(M) # APER x_1,x_2
+E_APR <- (sum(MCV)-sum(diag(MCV)))/sum(MCV) # \hat{E} APR x_1,x_2
+```
+
+Validacao Holdout
+
+```{r}
+set.seed(123)
+split <- sample.split(Hemofilia$x1, SplitRatio = 0.5) 
+train <- subset(Hemofilia, split==T)
+test <- subset(Hemofilia, split==F)
+
+lda_train <- lda(x1~x2+x3, data = train,prior =c(.75,.25))
+
+PT <- predict(lda_train, newdata = test, type = "response")
+glctable <- table(test$x1, PT$x >= 0.75)
+```
+
+```{r echo=FALSE}
+cat("Matriz de confusao")
+glctable
+cat("Acerto de classificacao por grupo",(diag(prop.table(glctable,1))))
+cat("Porporcao total de acerto",(sum(diag(prop.table(glctable)))))
+cat("erro aparente (APER) deste conjunto foi:",APER)
+cat("estimação da taxa de erro aparente foi:",E_APR)
+```
+
+```{r}
+pred = predict(lda_train, newdata = df, type = "response")
+pred
+```
+
 
 ## 91. Considere os dados sobre falsificação de notas do Exercício 84. Realize as análises Linear e Quadrática de discriminantes. É possível utilizar mistura de normais (função `mclust`) como análise de discriminantes? Se sim, faça o estudo e compare as estimativas APER para as três situações. Resuma os resultados e conclusões.
+
+```{r}
+# Discriminante linear
+data(bank)
+bank$Status <- factor(bank$Status)
+
+LDA <- lda(Status~., data = bank,prior=c(.5,.5))
+LDAp1 <- predict(LDA)
+LDAtable1 <- table(bank$Status, LDAp1$class)
+prop1 <- (diag(prop.table(LDAtable1,1))) # prop de classif. correta no grupo
+propt1 <- (sum(diag(prop.table(LDAtable1)))) # prop total de classf. correta 
+
+# Matrizes de confusão:
+M <- table(bank$Status, LDAp1$class) 
+
+# APER:
+APER <- (sum(M)-sum(diag(M)))/sum(M)
+
+#partimat(Status ~ ., data = bank, method = "lda")
+
+# Discriminante quadrático
+QDA <- qda(Status~., data = bank,prior=c(.5,.5))
+QDAp1 <- predict(QDA)
+QDAtable1 <- table(bank$Status, QDAp1$class)
+prop2 <- (diag(prop.table(QDAtable1,1))) # prop de classif. correta no grupo
+propt2 <- (sum(diag(prop.table(QDAtable1)))) # prop total de classf. correta 
+
+# Matrizes de confusão:
+M1 <- table(bank$Status, QDAp1$class) 
+
+# APER:
+APER1 <- (sum(M1)-sum(diag(M1)))/sum(M1)
+
+#partimat(Status ~ ., data = bank, method = "qda")
+
+# Análise de discriminantes por mistura de normais (mclust)
+
+Class <- factor(bank$Status, levels = 0:1,
+                labels = c("Genuína", "Falsificada"))
+
+X <- data.matrix(bank[,-1])
+
+mod <- Mclust(X)
+summary(mod$BIC)
+
+plot(mclustBIC(X))
+
+summary(mod)
+table(Class, mod$classification)    # por algum motivo este não renderiza
+RAND <- adjustedRandIndex(Class, mod$classification)
+
+# Matrizes de confusão:
+M2 <- table(bank$Status, mod$class) 
+
+# APER:
+APER2 <- (2+16)/(2+98+16+84)
+```
+
+
+
+
+
+
+
