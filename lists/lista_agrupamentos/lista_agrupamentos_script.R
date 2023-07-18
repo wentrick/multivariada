@@ -1,3 +1,4 @@
+pacman::p_load(cluster,mclust,andrews,graphics,gclus)
 
 m <- matrix(c(0 ,1,11,5,
               1 ,0,2,3,
@@ -36,3 +37,44 @@ plot(hcca,hang=-1)
 hcaa <- hclust(dist(t(animais),method="Jaccard",by_rows=T),
                "average")
 plot(hcaa,hang=-1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 84. Seis variáveis são medidas de 100 notas genuínas e 100 notas falsificadas (Flury and Riedwyl, 1988.)
+
+data(bank)
+head(bank)
+
+#medidas resumo
+summary(bank[bank$Status == 1,])
+summary(bank[bank$Status == 1,])
+
+
+#agrupamento
+cl1 <- kmeans(bank,2)
+
+plot(bank, pch=19)
+
+plot(bank, col = cl1$cluster)
+
+
+
+

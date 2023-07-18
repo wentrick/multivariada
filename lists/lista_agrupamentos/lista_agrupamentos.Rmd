@@ -312,12 +312,50 @@ head(bank)
 
 ### (a) Calcule as médias de cada variável em cada população (notas verdadeiras e falsificadas). Obtenha também a matriz de variância-covariâncias Σ em cada população. Obtenha um face plot de cada população utilizando os valores médios. Compare os resultados númericos com os gráficos. Discuta. Utilize o face plot para comparar os valores médios das variáveis para notas verdadeiras e notas falsas. Discuta os resultados. 
 
+
+Medidas resumo das notas verdadeiras
+```{r}
+summary(bank[bank$Status == 0,])
+```
+Medidas resumo das notas falsas
+
+```{r}
+summary(bank[bank$Status == 1,])
+```
+
 ### (b) Utilize um método de agrupamento para verificar se é possível distiguir as notas falsas das verdadeiras, imaginando que você não soubesse se 100 últimas notas eram verdadeiras.
+
+```{r}
+cl1 <- kmeans(bank,2)
+
+plot(bank, pch=19)
+```
+Podemos notar pela matriz de dispersao das variaveis do banco que a diagonal da nota parece agrupar bem as observacoes em relacao as outras variaveis. Por isso optou-se por plotar a matriz de dispersao da Diagonal da nota pela largura da parte superior.
+
+```{r}
+plot(bank[,c(6,7)], col = cl1$cluster)
+```
+
+Podemos perceber que esta bem dividido com apenas uma observacao ficando agrupada no cluster errado
 
 ### (c) Compare os resultados do agrupamento anterior com o agrupamento por mistura de normais
 
+```{r echo=FALSE}
+n <- length(bank[,1])
+bank_den <- densityMclust(bank[,c(6,7)], model="EII", G = 2)
+```
+
+
 ### (d) Utilize o Índice Ajustado de Rand para comparar seu agrupamento das 200 notas com a verdadeira classificação em genuínas e falsas. Avalie a qualidade do agrupamento.
 
+Comparando os resultados do k-mean com a verdadeira calssificacao 
+```{r}
+adjustedRandIndex(cl1$cluster,bank$Status)
+```
 
+Comparando os resultados da mistura de normais com a verdadeira calssificacao 
+```{r}
+adjustedRandIndex(cl1$cluster,bank_den$classification)
+```
 
 

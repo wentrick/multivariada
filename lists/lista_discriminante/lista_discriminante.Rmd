@@ -1,0 +1,247 @@
+---
+title: "Lista Discriminante"
+author: "Davi Wentrick Feijó"
+date: "2023-07-17"
+output: 
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: false
+    lightbox: true
+    gallery: false
+    highlight: tango
+    toc_depth : 4
+  html_document:
+    toc: false
+    toc_depth: 5
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,MASS,klaR,ggplot2,knitr,cowplot,Rchoice,AICcmodavg,questionr,mdscore,nlme)
+```
+
+
+## 85. Johnson e Wichern - Exercício 11.1.
+
+
+### a)
+Sabemos que a funcao da discriminante pode ser obtida por meio da seguinte formula:
+
+$$
+\hat{y} = (\bar x_1 + \bar x_2)^T S_{\text{amostral}}x = \hat a^T x
+$$
+A questao nos dá:
+
+$$
+X_1 = \begin{bmatrix} 3 & 7 \\ 2 & 4 \\ 4 & 7 \\ \end{bmatrix} \ \ \ X_2 = \begin{bmatrix} 6 & 9 \\ 5 & 7 \\ 4 & 8 \\ \end{bmatrix}
+$$
+
+
+$$
+\bar x_1 = \begin{bmatrix} 3  \\ 6  \\ \end{bmatrix} \ \ \ \ \ \bar x_2 = \begin{bmatrix} 5  \\ 8  \\ \end{bmatrix}
+$$
+
+$$
+S_{\text{amostral}} = \begin{bmatrix}
+2 & -1 \\
+1 & 1 \\
+\end{bmatrix}
+$$
+
+Com isso chegamos a:
+
+$$
+( \begin{bmatrix} 3  \\ 6  \\ \end{bmatrix} -  \begin{bmatrix} 5  \\ 8  \\ \end{bmatrix})^T \begin{bmatrix} 2 & -1 \\ 1 & 1 \\ \end{bmatrix}x = \begin{bmatrix} -2 & 0  \\  \end{bmatrix}x = -2x
+$$
+### b)
+
+Temos 
+
+$$
+x_0 = \begin{bmatrix} 2 & 7  \\  \end{bmatrix}
+$$
+Para alocar a observacao para uma das populacoes temos que calcular o $\hat m$
+
+$$
+\hat m = \frac{1}{2}(\hat y_1 + \hat y_2) = \frac{1}{2}(\hat a\bar x_1 + \hat a\bar x_2) = -8
+$$
+Vamos alocar $x_0$ para $\pi_1$ se:
+
+$$
+\hat y_0 = \begin{bmatrix} 2 & 7  \\  \end{bmatrix}x_0 \geq \hat m = -8
+$$
+caso contrario ele vai para $\pi_2$
+
+$$
+\begin{bmatrix} -2 & 0  \\  \end{bmatrix}x_0 = -4
+$$
+Como o resultado é maior que -8 alocamos a observacaqo para $\pi_1$
+
+## 86. Johnson e Wichern - Exercício 11.2.
+
+```{r}
+x11 = c(90.0,115.5,94.8,91.5,117.0,140.1,138.0,112.8,99.0,123.0,81.0,110.0)
+x21 = c(18.4,16.8,21.6,20.8,23.6,19.2,17.6,22.4,20,20.8,22.0,20)
+x12 = c(105,82.8,94.8,73.2,114.0,79.2,89.4,96,77.4,63.0,81,93)
+x22 = c(19.6,20.8,17.2,20.4,17.6,17.6,16,18.4,16.4,18.8,14,14.8)
+
+dados = data.frame(x11,x21,x12,x22)
+
+summary(dados)
+```
+
+### a)
+
+```{r}
+#obs de cada populacao
+n1 = 12
+n2 = 12
+```
+
+
+```{r}
+x1_barra = c(mean(x11),mean(x21))
+
+x2_barra = c(mean(x12),mean(x22))
+```
+
+```{r echo=FALSE}
+cat("Medias de X1",x1_barra)
+cat("Medias de X2",x2_barra)
+```
+
+```{r}
+s1 = cov(dados[,c(1,2)])
+
+s2 = cov(dados[,c(3,4)])
+```
+
+```{r echo=FALSE}
+cat("Covariancia de X1")
+s1
+cat("Covariancia de X2")
+s2
+```
+
+
+
+```{r}
+s_pooled = ((n1-1)/((n1-1)+(n2-1))) * s1 + ((n1-1)/((n1-1)+(n2-1))) * s2
+
+s_pooled_inv = solve(s_pooled)
+```
+
+```{r echo=FALSE}
+cat("S amostral")
+s_pooled
+cat("S amostral invertida")
+s_pooled_inv
+```
+
+```{r}
+a = t((x1_barra - x2_barra)) %*% s_pooled_inv
+
+m = 0.5*(a %*% x1_barra+ a %*% x2_barra)
+```
+
+```{r echo=FALSE}
+cat("Nosso a")
+a
+cat("Nosso M")
+m
+```
+
+### b)
+
+```{r echo=FALSE}
+class = rep(c("owner","nonowner"),each=12)
+test = rep(m,12)
+dados = data.frame(class,test, x1 = c(x11, x12), x2 = c(x21, x22)) 
+dados <- dados %>%
+  mutate(result = a[1] * x1 + a[2] * x2,
+         result_class = ifelse(result >=  test , "owner", "nonowner")) 
+dados
+```
+
+### c)
+
+```{r echo=FALSE}
+matriz = dados %>%
+  group_by(class,result_class) %>%
+  summarise(freq = n())
+matriz
+```
+
+```{r echo=FALSE}
+cat("A frequencia de erro é:",3/24)
+```
+
+### d)
+
+Assumimos que  $\pi_1$ e $\pi_2$ vem de uma distribuicao norma multivariada com matriz de covariancias iguais
+
+## 87. Johnson e Wichern - Exercício 11.4.
+
+### a)
+
+$$
+c(2|1) = 50 \ \ \ c(1|2) = 100
+$$
+$$
+\frac{f_1(x)}{f_2(x)} = \frac{c(1|2)}{c(2|1)} \frac{p_2}{p_1} = \frac{100}{50} \frac{0.2}{0.8} = 0.5 
+$$
+
+### b)
+
+$$
+\frac{f_1(x)}{f_2(x)} = \frac{0.3}{0.5} = 0.6 \geq 0.5
+$$
+
+logo alocamos para $\pi_1$
+
+
+
+## 88. Johnson e Wichern - Exercício 11.10.
+
+### a) 
+
+```{r}
+n1 = 11
+n2 = 12
+
+x1_barra = c(-1,-1)
+
+x2_barra = c(2,1)
+
+s_pooled = matrix(c(7.3, -1.1,
+                       -1.1, 4.8),byrow=TRUE,ncol =2)
+
+p=2
+t2 = (x1_barra - x2_barra) %*% solve(((1/11)+(1/12))*  s_pooled) %*% (x1_barra - x2_barra)
+
+pf(t2,p,n1+n2-p-1,lower.tail = F)
+```
+
+### b)
+
+```{r}
+x0 = c(0,1)
+
+a = t((x1_barra - x2_barra)) %*% solve(s_pooled) 
+
+y_0 = a %*% x0
+
+m = 0.5*(a %*% x1_barra + a %*% x2_barra)
+```
+
+Como -0.53 é maior que -0.25 alocamos essa observacao para $\pi_2$ 
+
+
+## 89. Johnson e Wichern - Exercício 11.24. - Dados: T11-4-BankruptcyData.dat.
+
+
+## 90. Johnson e Wichern - Exercício 11.32. - Dados: T11-8-Hemofilia.dat.
+
+
+## 91. Considere os dados sobre falsificação de notas do Exercício 84. Realize as análises Linear e Quadrática de discriminantes. É possível utilizar mistura de normais (função `mclust`) como análise de discriminantes? Se sim, faça o estudo e compare as estimativas APER para as três situações. Resuma os resultados e conclusões.

@@ -2,8 +2,7 @@
 # ANALISE MULTIVARIADA
 # Prof. George von Borries
 #### Exemplos Notas de Aula ####
-install.packages("mclust")
-pacman::p_load(cluster,mclust,andrews,graphics)
+pacman::p_load(cluster,mclust,andrews,graphics,foreign,gplots,heatmap.plus,proxy)
 #### (1) XYdata ####
 
 
@@ -242,7 +241,7 @@ plot(hcaa,hang=-1)
 
 #### (4.2) ALGORITMOS NAO-HIERARQUICOS ####
 
-library(cluster)
+library()
 
 x <- rbind(matrix(rnorm(100, sd = 0.3), ncol = 2),
            matrix(rnorm(100, mean = 1, sd = 0.3), ncol = 2))
@@ -295,7 +294,7 @@ plot(agn2)
 # Prof. George von Borries.
 
 
-load("C:/001-dados/cursos/geyser.rda")
+load("data/geyser.rda")
 geyser
 
 (meang <- apply(geyser,2,mean))
@@ -352,7 +351,6 @@ plot(geyser.g$X1,geyser.g$X2,col=geyser.g$groups.3,pch=16,
 
 #### (5.1) ARI ####
 
-library(mclust)
 adjustedRandIndex(geyser.km2$cluster,geyser.g$groups.2)
 adjustedRandIndex(geyser.km3$cluster,geyser.g$groups.3)
 
@@ -362,7 +360,6 @@ par(mfrow=c(1, 1))
 
 #### (6) MCLUST ####
 
-library(mclust)
 n <- length(geyser[,1])
 geyser.mclust2den <- densityMclust(geyser, model="VVV", G = 2)
 
@@ -387,12 +384,6 @@ legend(x=1.5, y = 95, legend = c("Contornos densidade",
                                  "Componente 2"),
        col = c("black", "red", "blue"), lty = c(1,0,0),
        lwd = c(2,0,0), pch = c(NA, 19, 19))
-
-
-
-
-
-
 
 
 
